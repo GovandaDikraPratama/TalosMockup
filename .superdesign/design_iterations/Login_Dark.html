@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>TALOS - Login (Dark Mode)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f0c29 0%, #1a1a2e 50%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            color: #e4e4e7;
+        }
+
+        .status-bar {
+            height: 44px;
+            background: transparent;
+        }
+
+        .login-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 24px 40px;
+            justify-content: center;
+            max-width: 440px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Logo Section */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .logo {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 20px;
+            display: inline-block;
+            filter: drop-shadow(0 12px 32px rgba(38, 208, 206, 0.3))
+                    drop-shadow(0 4px 16px rgba(26, 41, 128, 0.4));
+            transition: filter 0.3s ease;
+        }
+
+        .logo:hover {
+            filter: drop-shadow(0 16px 40px rgba(38, 208, 206, 0.4))
+                    drop-shadow(0 6px 20px rgba(26, 41, 128, 0.5));
+        }
+
+        .welcome-text {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #26d0ce 0%, #1a9cff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            text-shadow: 0 0 30px rgba(38, 208, 206, 0.3);
+        }
+
+        .welcome-subtitle {
+            font-size: 15px;
+            color: #a1a1aa;
+            font-weight: 500;
+        }
+
+        /* Form Styles */
+        .login-form {
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #e4e4e7;
+            padding-left: 4px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .input-icon svg {
+            filter: drop-shadow(0 2px 8px rgba(255, 255, 255, 0.3));
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 18px 52px 18px 52px;
+            border: 2px solid rgba(63, 63, 70, 0.6);
+            border-radius: 16px;
+            font-size: 16px;
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(10px);
+            transition: all 0.25s ease;
+            -webkit-appearance: none;
+            appearance: none;
+            font-family: inherit;
+            color: #e4e4e7;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #26d0ce;
+            background: rgba(24, 24, 27, 0.9);
+            box-shadow: 0 0 0 3px rgba(38, 208, 206, 0.15),
+                        0 8px 24px rgba(38, 208, 206, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #52525b;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #71717a;
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.2s ease;
+            min-width: 44px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+        }
+
+        .password-toggle svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+        }
+
+        .password-toggle:active {
+            color: #26d0ce;
+            background: rgba(38, 208, 206, 0.15);
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        /* Buttons */
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px 20px;
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 56px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #26d0ce 0%, #1a9cff 100%);
+            color: #ffffff;
+            box-shadow: 0 8px 24px rgba(38, 208, 206, 0.35),
+                        0 4px 12px rgba(26, 156, 255, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:active {
+            box-shadow: 0 4px 16px rgba(38, 208, 206, 0.4),
+                        0 2px 8px rgba(26, 156, 255, 0.3);
+        }
+
+        .btn-primary:active::before {
+            left: 100%;
+        }
+
+        .btn-secondary {
+            background: rgba(38, 208, 206, 0.1);
+            color: #26d0ce;
+            border: 2px solid rgba(38, 208, 206, 0.3);
+            box-shadow: 0 4px 16px rgba(38, 208, 206, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:active {
+            background: rgba(38, 208, 206, 0.2);
+            border-color: rgba(38, 208, 206, 0.5);
+            box-shadow: 0 2px 12px rgba(38, 208, 206, 0.2);
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 28px 0;
+            color: #71717a;
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(63, 63, 70, 0.5);
+        }
+
+        .divider span {
+            padding: 0 16px;
+            font-weight: 600;
+        }
+
+        /* Footer Links */
+        .footer-links {
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .server-link {
+            color: #a1a1aa;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .server-link:active {
+            background: rgba(38, 208, 206, 0.1);
+            color: #26d0ce;
+        }
+
+        /* Loading State */
+        .btn.loading {
+            position: relative;
+            color: transparent;
+            pointer-events: none;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Error State */
+        .input-error {
+            border-color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+
+        .error-message {
+            display: none;
+            color: #f87171;
+            font-size: 13px;
+            margin-top: 6px;
+            padding-left: 4px;
+            font-weight: 600;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: -12px;
+            margin-bottom: 24px;
+        }
+
+        .forgot-password a {
+            color: #26d0ce;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px;
+            display: inline-block;
+            background: linear-gradient(135deg, #26d0ce 0%, #1a9cff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            transition: all 0.2s ease;
+        }
+
+        .forgot-password a:active {
+            opacity: 0.7;
+        }
+
+        /* Safe area */
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: max(0px, env(safe-area-inset-left));
+                padding-right: max(0px, env(safe-area-inset-right));
+            }
+
+            .login-container {
+                padding-bottom: max(40px, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Responsive */
+        @media (max-height: 700px) {
+            .logo {
+                width: 100px;
+                height: 100px;
+            }
+
+            .logo-container {
+                margin-bottom: 32px;
+            }
+
+            .welcome-text {
+                margin-bottom: 28px;
+            }
+
+            .welcome-title {
+                font-size: 24px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .login-container {
+                max-width: 440px;
+            }
+        }
+
+        /* Modern enhancements */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .logo-container:hover .logo {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Glassmorphism effect */
+        .form-input,
+        .btn-secondary {
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(24, 24, 27, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(38, 208, 206, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(38, 208, 206, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="status-bar"></div>
+
+    <div class="login-container">
+        <!-- Logo Section -->
+        <div class="logo-container">
+            <img src="../../images/talos_logo.png" alt="TALOS Logo" class="logo">
+        </div>
+
+        <!-- Welcome Text -->
+        <div class="welcome-text">
+            <h1 class="welcome-title">Selamat Datang</h1>
+            <p class="welcome-subtitle">Silakan masuk ke akun Anda</p>
+        </div>
+
+        <!-- Login Form -->
+        <form class="login-form" id="loginForm">
+            <div class="input-group">
+                <label class="input-label">Username</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="8" r="4" fill="#ffffff" opacity="0.95"/>
+                            <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#e0f2fe" opacity="0.9"/>
+                            <circle cx="12" cy="8" r="4" stroke="#06b6d4" stroke-width="1"/>
+                        </svg>
+                    </span>
+                    <input
+                        type="text"
+                        class="form-input"
+                        id="username"
+                        name="username"
+                        placeholder="Masukkan username"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+                <div class="error-message" id="usernameError">Username tidak boleh kosong</div>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Password</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="5" y="11" width="14" height="10" rx="2" fill="#e0f2fe" opacity="0.9"/>
+                            <path d="M8 11V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7V11" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.95"/>
+                            <circle cx="12" cy="16" r="2.5" fill="#06b6d4"/>
+                            <rect x="5" y="11" width="14" height="10" rx="2" stroke="#06b6d4" stroke-width="1"/>
+                        </svg>
+                    </span>
+                    <input
+                        type="password"
+                        class="form-input"
+                        id="password"
+                        name="password"
+                        placeholder="Masukkan password"
+                        autocomplete="current-password"
+                        required
+                    >
+                    <button type="button" class="password-toggle" onclick="togglePassword()" aria-label="Toggle password visibility">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                <div class="error-message" id="passwordError">Password tidak boleh kosong</div>
+            </div>
+
+            <div class="forgot-password">
+                <a href="#" onclick="handleForgotPassword(event)">Lupa Password?</a>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn btn-primary">
+                    <span>Masuk</span>
+                </button>
+            </div>
+        </form>
+
+        <div class="divider">
+            <span>atau</span>
+        </div>
+
+        <!-- Alternative Login -->
+        <div class="btn-group">
+            <button type="button" class="btn btn-secondary" onclick="handleCardLogin()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 6px rgba(255, 255, 255, 0.2));">
+                    <rect x="2" y="5" width="20" height="14" rx="2" fill="#e0f2fe"/>
+                    <rect x="2" y="9" width="20" height="3" fill="#06b6d4"/>
+                    <rect x="4" y="14" width="8" height="2" rx="1" fill="#ffffff" opacity="0.8"/>
+                    <rect x="14" y="14" width="6" height="2" rx="1" fill="#ffffff" opacity="0.8"/>
+                    <rect x="2" y="5" width="20" height="14" rx="2" stroke="#06b6d4" stroke-width="1"/>
+                </svg>
+                <span>Login Dengan Kartu</span>
+            </button>
+        </div>
+
+        <!-- Footer Links -->
+        <div class="footer-links">
+            <a href="#" class="server-link" onclick="handleEditServer(event)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.2));">
+                    <circle cx="12" cy="12" r="3" fill="#06b6d4"/>
+                    <path d="M12 2L10.5 4.5L8 4L7 6.5L4.5 7L4 9.5L2 11L3.5 13.5L2 15L4 16.5L4.5 19L7 19.5L8 22L10.5 21.5L12 24L13.5 21.5L16 22L17 19.5L19.5 19L20 16.5L22 15L20.5 13.5L22 11L20 9.5L19.5 7L17 6.5L16 4L13.5 4.5L12 2Z" fill="#e0f2fe"/>
+                    <circle cx="12" cy="12" r="5" stroke="#ffffff" stroke-width="1.5" fill="none" opacity="0.9"/>
+                </svg>
+                <span>Edit Server</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Prevent zoom on input focus for iOS
+        document.addEventListener('touchstart', function() {}, {passive: true});
+
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.querySelector('.password-toggle');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+            }
+        }
+
+        // Form validation
+        function validateForm() {
+            const username = document.getElementById('username');
+            const password = document.getElementById('password');
+            const usernameError = document.getElementById('usernameError');
+            const passwordError = document.getElementById('passwordError');
+
+            let isValid = true;
+
+            // Reset errors
+            username.classList.remove('input-error');
+            password.classList.remove('input-error');
+            usernameError.classList.remove('show');
+            passwordError.classList.remove('show');
+
+            // Validate username
+            if (!username.value.trim()) {
+                username.classList.add('input-error');
+                usernameError.classList.add('show');
+                isValid = false;
+            }
+
+            // Validate password
+            if (!password.value) {
+                password.classList.add('input-error');
+                passwordError.classList.add('show');
+                isValid = false;
+            }
+
+            return isValid;
+        }
+
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!validateForm()) {
+                return;
+            }
+
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Add loading state
+            const submitBtn = this.querySelector('.btn-primary');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            // Simulate login process
+            setTimeout(() => {
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+
+                console.log('Login attempt:', { username });
+                // Add your actual login logic here
+                alert('Login berhasil! (Demo)\nUsername: ' + username);
+            }, 1500);
+        });
+
+        // Handle card login
+        function handleCardLogin() {
+            alert('Membuka login dengan kartu...\nSilakan tap kartu Anda');
+            // Add your card login logic here
+        }
+
+        // Handle edit server
+        function handleEditServer(e) {
+            e.preventDefault();
+            alert('Membuka pengaturan server...');
+            // Add your server settings logic here
+        }
+
+        // Handle forgot password
+        function handleForgotPassword(e) {
+            e.preventDefault();
+            alert('Link reset password akan dikirim ke email Anda');
+            // Add your forgot password logic here
+        }
+
+        // Clear error on input
+        document.getElementById('username').addEventListener('input', function() {
+            this.classList.remove('input-error');
+            document.getElementById('usernameError').classList.remove('show');
+        });
+
+        document.getElementById('password').addEventListener('input', function() {
+            this.classList.remove('input-error');
+            document.getElementById('passwordError').classList.remove('show');
+        });
+
+        // Handle viewport height changes
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+        window.addEventListener('resize', () => {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        });
+    </script>
+</body>
+</html>

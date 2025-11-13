@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>TALOS - Daftar Aset (Dark Mode)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f0c29 0%, #1a1a2e 50%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            color: #e4e4e7;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            padding: 12px 20px 20px;
+            box-shadow: 0 8px 24px rgba(38, 208, 206, 0.3),
+                        0 4px 12px rgba(26, 41, 128, 0.4);
+            position: relative;
+            z-index: 100;
+        }
+
+        .status-bar {
+            height: 44px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .back-btn, .add-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+            font-size: 24px;
+            color: white;
+        }
+
+        .back-btn:active, .add-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+
+        .header-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Search Section */
+        .search-section {
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(63, 63, 70, 0.5);
+        }
+
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-icon svg {
+            filter: drop-shadow(0 2px 8px rgba(92, 225, 230, 0.4));
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 2px solid rgba(63, 63, 70, 0.6);
+            border-radius: 14px;
+            font-size: 15px;
+            background: rgba(24, 24, 27, 0.9);
+            transition: all 0.25s ease;
+            color: #e4e4e7;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #26d0ce;
+            background: rgba(24, 24, 27, 1);
+            box-shadow: 0 0 0 3px rgba(38, 208, 206, 0.15),
+                        0 8px 24px rgba(38, 208, 206, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: #52525b;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .filter-section::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            background: rgba(24, 24, 27, 0.9);
+            border: 2px solid rgba(63, 63, 70, 0.6);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #a1a1aa;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-chip:active {
+            transform: scale(0.97);
+        }
+
+        .filter-chip.active {
+            background: linear-gradient(135deg, #26d0ce 0%, #1a9cff 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(38, 208, 206, 0.3);
+        }
+
+        .filter-chip .icon {
+            font-size: 16px;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            padding: 16px 20px;
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(63, 63, 70, 0.5);
+            display: flex;
+            gap: 12px;
+        }
+
+        .scan-btn {
+            flex: 1;
+            background: linear-gradient(135deg, #26d0ce 0%, #1a9cff 100%);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 8px 24px rgba(38, 208, 206, 0.35),
+                        0 4px 12px rgba(26, 156, 255, 0.25);
+            transition: all 0.2s ease;
+        }
+
+        .scan-btn:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 16px rgba(38, 208, 206, 0.4),
+                        0 2px 8px rgba(26, 156, 255, 0.3);
+        }
+
+        .sort-toggle {
+            background: rgba(24, 24, 27, 0.9);
+            border: 2px solid rgba(63, 63, 70, 0.6);
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.2s ease;
+            color: #a1a1aa;
+        }
+
+        .sort-toggle:active {
+            transform: scale(0.95);
+            border-color: #26d0ce;
+            background: rgba(38, 208, 206, 0.15);
+            color: #26d0ce;
+        }
+
+        /* Asset List */
+        .asset-list {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 16px 20px 20px;
+        }
+
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .result-count {
+            font-size: 14px;
+            color: #a1a1aa;
+            font-weight: 500;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 4px;
+        }
+
+        .view-btn {
+            background: rgba(24, 24, 27, 0.9);
+            border: 2px solid rgba(63, 63, 70, 0.6);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            transition: all 0.2s ease;
+        }
+
+        .view-btn.active {
+            background: linear-gradient(135deg, #26d0ce 0%, #1a9cff 100%);
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(38, 208, 206, 0.3);
+        }
+
+        .view-btn:active {
+            transform: scale(0.95);
+        }
+
+        .asset-card {
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(63, 63, 70, 0.5);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .asset-card:active {
+            transform: scale(0.99);
+            box-shadow: 0 8px 24px rgba(38, 208, 206, 0.2),
+                        0 4px 16px rgba(0, 0, 0, 0.4);
+            border-color: #26d0ce;
+        }
+
+        .asset-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+
+        .asset-info {
+            flex: 1;
+        }
+
+        .asset-id {
+            font-size: 13px;
+            color: #a1a1aa;
+            font-weight: 600;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .asset-name {
+            font-size: 17px;
+            color: #e4e4e7;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .status-badges {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.available {
+            background: rgba(32, 227, 178, 0.2);
+            color: #20e3b2;
+            box-shadow: 0 0 12px rgba(32, 227, 178, 0.15);
+        }
+
+        .status-badge.checkable {
+            background: rgba(38, 208, 206, 0.2);
+            color: #26d0ce;
+            box-shadow: 0 0 12px rgba(38, 208, 206, 0.15);
+        }
+
+        .status-badge .check-icon {
+            font-size: 14px;
+        }
+
+        .asset-user {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid rgba(38, 208, 206, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .user-name {
+            font-size: 11px;
+            color: #a1a1aa;
+            font-weight: 600;
+            font-style: italic;
+            text-align: center;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .asset-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid rgba(63, 63, 70, 0.5);
+            margin-top: 12px;
+        }
+
+        .asset-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: rgba(38, 208, 206, 0.1);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #a1a1aa;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+            background: rgba(38, 208, 206, 0.2);
+        }
+
+        .action-btn.primary {
+            background: rgba(38, 208, 206, 0.2);
+            color: #26d0ce;
+            border: 1px solid rgba(38, 208, 206, 0.3);
+        }
+
+        .action-btn.primary:active {
+            background: rgba(38, 208, 206, 0.3);
+        }
+
+        .last-updated {
+            font-size: 11px;
+            color: #71717a;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+            filter: grayscale(0.5);
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: #a1a1aa;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-subtext {
+            font-size: 14px;
+            color: #71717a;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(63, 63, 70, 0.3);
+            border-top-color: #26d0ce;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 16px;
+            box-shadow: 0 0 20px rgba(38, 208, 206, 0.3);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Safe area */
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: max(0px, env(safe-area-inset-left));
+                padding-right: max(0px, env(safe-area-inset-right));
+            }
+
+            .asset-list {
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .asset-list {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+        }
+
+        /* Smooth scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(24, 24, 27, 0.5);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(38, 208, 206, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(38, 208, 206, 0.5);
+        }
+
+        /* Glassmorphism effects */
+        .search-section,
+        .action-bar,
+        .asset-card {
+            -webkit-backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="status-bar"></div>
+
+        <div class="header-content">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <h1 class="header-title">Daftar Aset</h1>
+            <button class="add-btn" onclick="addNewAsset()">+</button>
+        </div>
+    </header>
+
+    <!-- Search Section -->
+    <div class="search-section">
+        <div class="search-wrapper">
+            <span class="search-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <circle cx="11" cy="11" r="7" stroke="#5ce1e6" stroke-width="2" fill="#38bdf8" opacity="0.3"/>
+                    <circle cx="11" cy="11" r="4" fill="#e0f2fe"/>
+                    <path d="M21 21L16.65 16.65" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <input
+                type="text"
+                class="search-input"
+                placeholder="Cari aset berdasarkan nama atau ID..."
+                oninput="handleSearch(this.value)"
+            >
+        </div>
+
+        <div class="filter-section">
+            <button class="filter-chip active" onclick="toggleFilter(this)">
+                <span class="icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5));">
+                        <rect x="5" y="3" width="14" height="18" rx="2" fill="#ffffff"/>
+                        <path d="M8 3V1M16 3V1" stroke="#e0f2fe" stroke-width="2" stroke-linecap="round"/>
+                        <rect x="8" y="8" width="8" height="2" rx="1" fill="#38bdf8"/>
+                        <rect x="8" y="12" width="8" height="2" rx="1" fill="#38bdf8"/>
+                        <rect x="8" y="16" width="5" height="2" rx="1" fill="#5ce1e6"/>
+                    </svg>
+                </span>
+                <span>Semua</span>
+            </button>
+            <button class="filter-chip" onclick="toggleFilter(this)">
+                <span class="icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(92, 225, 230, 0.5));">
+                        <rect x="3" y="3" width="18" height="18" rx="4" fill="#5ce1e6"/>
+                        <rect x="5" y="5" width="14" height="14" rx="2" fill="#38bdf8" opacity="0.4"/>
+                        <path d="M7 12L10.5 15.5L17 9" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+                <span>Available</span>
+            </button>
+            <button class="filter-chip" onclick="toggleFilter(this)">
+                <span class="icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(92, 225, 230, 0.5));">
+                        <rect x="3" y="4" width="18" height="18" rx="2" fill="#5ce1e6"/>
+                        <path d="M16 2V6M8 2V6" stroke="#38bdf8" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M3 10H21" stroke="#ffffff" stroke-width="2"/>
+                        <circle cx="12" cy="15" r="2" fill="#e0f2fe"/>
+                    </svg>
+                </span>
+                <span>Hari Ini</span>
+            </button>
+            <button class="filter-chip" onclick="toggleFilter(this)">
+                <span class="icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(92, 225, 230, 0.5));">
+                        <circle cx="12" cy="8" r="4" fill="#5ce1e6"/>
+                        <path d="M12 14C7.58172 14 4 17.5817 4 22H20C20 17.5817 16.4183 14 12 14Z" fill="#38bdf8"/>
+                        <circle cx="12" cy="8" r="2" fill="#ffffff"/>
+                    </svg>
+                </span>
+                <span>Assigned</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <button class="scan-btn" onclick="scanAsset()">
+            <span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));">
+                    <rect x="3" y="5" width="18" height="14" rx="3" fill="white" opacity="0.95"/>
+                    <rect x="5" y="7" width="14" height="10" rx="2" fill="white" opacity="0.8"/>
+                    <circle cx="12" cy="12" r="3.5" stroke="white" stroke-width="2" fill="white" opacity="0.9"/>
+                    <circle cx="17" cy="8" r="1" fill="white"/>
+                </svg>
+            </span>
+            <span>Scan Asset</span>
+        </button>
+        <button class="sort-toggle" onclick="toggleSort()">⇅</button>
+    </div>
+
+    <!-- Asset List -->
+    <div class="asset-list" id="assetList">
+        <div class="list-header">
+            <span class="result-count">Menampilkan 5 aset</span>
+
+        </div>
+
+        <!-- Asset Cards -->
+        <div class="asset-card" onclick="viewAssetDetail('AS#00015')">
+            <div class="asset-header">
+                <div class="asset-info">
+                    <div class="asset-id">AS#00015</div>
+                    <div class="asset-name">Tripod</div>
+                    <div class="status-badges">
+                        <span class="status-badge available">
+                            <span>●</span>
+                            <span>Available</span>
+                        </span>
+                        <span class="status-badge checkable">
+                            <span class="check-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.6));">
+                                    <path d="M5 13L9 17L19 7" stroke="#26d0ce" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <span>Checkable</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="asset-user">
+                    <img src="https://i.pravatar.cc/150?img=12" alt="User" class="user-avatar">
+                    <span class="user-name">Albar Muqsit</span>
+                </div>
+            </div>
+            <div class="asset-footer">
+                <div class="asset-actions">
+                    <button class="action-btn primary" onclick="event.stopPropagation(); checkAsset('AS#00015')">
+                        <span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.5));">
+                                <path d="M5 13L9 17L19 7" stroke="#26d0ce" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span>Check</span>
+                    </button>
+                    <button class="action-btn" onclick="event.stopPropagation(); viewDetails('AS#00015')">
+                        <span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(92, 225, 230, 0.4));">
+                                <ellipse cx="12" cy="12" rx="9" ry="6" fill="#5ce1e6" opacity="0.5"/>
+                                <circle cx="12" cy="12" r="3.5" fill="#38bdf8"/>
+                                <circle cx="12" cy="12" r="1.5" fill="#ffffff"/>
+                            </svg>
+                        </span>
+                        <span>Detail</span>
+                    </button>
+                </div>
+                <span class="last-updated">2 jam lalu</span>
+            </div>
+        </div>
+
+        <div class="asset-card" onclick="viewAssetDetail('AS#00014')">
+            <div class="asset-header">
+                <div class="asset-info">
+                    <div class="asset-id">AS#00014</div>
+                    <div class="asset-name">Kamera Cctv</div>
+                    <div class="status-badges">
+                        <span class="status-badge available">
+                            <span>●</span>
+                            <span>Available</span>
+                        </span>
+                        <span class="status-badge checkable">
+                            <span class="check-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.6));">
+                                    <path d="M5 13L9 17L19 7" stroke="#26d0ce" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <span>Checkable</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="asset-user">
+                    <img src="https://i.pravatar.cc/150?img=12" alt="User" class="user-avatar">
+                    <span class="user-name">Albar Muqsit</span>
+                </div>
+            </div>
+            <div class="asset-footer">
+                <div class="asset-actions">
+                    <button class="action-btn primary" onclick="event.stopPropagation(); checkAsset('AS#00014')">
+                        <span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.5));">
+                                <path d="M5 13L9 17L19 7" stroke="#26d0ce" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span>Check</span>
+                    </button>
+                    <button class="action-btn" onclick="event.stopPropagation(); viewDetails('AS#00014')">
+                        <span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(92, 225, 230, 0.4));">
+                                <ellipse cx="12" cy="12" rx="9" ry="6" fill="#5ce1e6" opacity="0.5"/>
+                                <circle cx="12" cy="12" r="3.5" fill="#38bdf8"/>
+                                <circle cx="12" cy="12" r="1.5" fill="#ffffff"/>
+                            </svg>
+                        </span>
+                        <span>Detail</span>
+                    </button>
+                </div>
+                <span class="last-updated">5 jam lalu</span>
+            </div>
+        </div>
+
+        <div class="asset-card" onclick="viewAssetDetail('AS#00012')">
+            <div class="asset-header">
+                <div class="asset-info">
+                    <div class="asset-id">AS#00012</div>
+                    <div class="asset-name">Lan Tester</div>
+                    <div class="status-badges">
+                        <span class="status-badge available">
+                            <span>●</span>
+                            <span>Available</span>
+                        </span>
+                        <span class="status-badge checkable">
+                            <span class="check-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.6));">
+                                    <path d="M5 13L9 17L19 7" stroke="#26d0ce" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <span>Checkable</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="asset-user">
+                    <img src="https://i.pravatar.cc/150?img=12" alt="User" class="user-avatar">
+                    <span class="user-name">Albar Muqsit</span>
+                </div>
+            </div>
+            <div class="asset-footer">
+                <div class="asset-actions">
+                    <button class="action-btn primary" onclick="event.stopPropagation(); checkAsset('AS#00012')">
+                        <span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.5));">
+                                <path d="M5 13L9 17L19 7" stroke="#26d0ce" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span>Check</span>
+                    </button>
+                    <button class="action-btn" onclick="event.stopPropagation(); viewDetails('AS#00012')">
+                        <span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(92, 225, 230, 0.4));">
+                                <ellipse cx="12" cy="12" rx="9" ry="6" fill="#5ce1e6" opacity="0.5"/>
+                                <circle cx="12" cy="12" r="3.5" fill="#38bdf8"/>
+                                <circle cx="12" cy="12" r="1.5" fill="#ffffff"/>
+                            </svg>
+                        </span>
+                        <span>Detail</span>
+                    </button>
+                </div>
+                <span class="last-updated">1 hari lalu</span>
+            </div>
+        </div>
+
+        <div class="asset-card" onclick="viewAssetDetail('AS#00011')">
+            <div class="asset-header">
+                <div class="asset-info">
+                    <div class="asset-id">AS#00011</div>
+                    <div class="asset-name">Laser Distance Meter</div>
+                    <div class="status-badges">
+                        <span class="status-badge available">
+                            <span>●</span>
+                            <span>Available</span>
+                        </span>
+                        <span class="status-badge checkable">
+                            <span class="check-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.6));">
+                                    <path d="M5 13L9 17L19 7" stroke="#26d0ce" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <span>Checkable</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="asset-user">
+                    <img src="https://i.pravatar.cc/150?img=12" alt="User" class="user-avatar">
+                    <span class="user-name">Albar Muqsit</span>
+                </div>
+            </div>
+            <div class="asset-footer">
+                <div class="asset-actions">
+                    <button class="action-btn primary" onclick="event.stopPropagation(); checkAsset('AS#00011')">
+                        <span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.5));">
+                                <path d="M5 13L9 17L19 7" stroke="#26d0ce" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span>Check</span>
+                    </button>
+                    <button class="action-btn" onclick="event.stopPropagation(); viewDetails('AS#00011')">
+                        <span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(92, 225, 230, 0.4));">
+                                <ellipse cx="12" cy="12" rx="9" ry="6" fill="#5ce1e6" opacity="0.5"/>
+                                <circle cx="12" cy="12" r="3.5" fill="#38bdf8"/>
+                                <circle cx="12" cy="12" r="1.5" fill="#ffffff"/>
+                            </svg>
+                        </span>
+                        <span>Detail</span>
+                    </button>
+                </div>
+                <span class="last-updated">1 hari lalu</span>
+            </div>
+        </div>
+
+        <div class="asset-card" onclick="viewAssetDetail('AS#00010')">
+            <div class="asset-header">
+                <div class="asset-info">
+                    <div class="asset-id">AS#00010</div>
+                    <div class="asset-name">Tang Crimping</div>
+                    <div class="status-badges">
+                        <span class="status-badge available">
+                            <span>●</span>
+                            <span>Available</span>
+                        </span>
+                        <span class="status-badge checkable">
+                            <span class="check-icon">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.6));">
+                                    <path d="M5 13L9 17L19 7" stroke="#26d0ce" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </span>
+                            <span>Checkable</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="asset-user">
+                    <img src="https://i.pravatar.cc/150?img=12" alt="User" class="user-avatar">
+                    <span class="user-name">Albar Muqsit</span>
+                </div>
+            </div>
+            <div class="asset-footer">
+                <div class="asset-actions">
+                    <button class="action-btn primary" onclick="event.stopPropagation(); checkAsset('AS#00010')">
+                        <span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.5));">
+                                <path d="M5 13L9 17L19 7" stroke="#26d0ce" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span>Check</span>
+                    </button>
+                    <button class="action-btn" onclick="event.stopPropagation(); viewDetails('AS#00010')">
+                        <span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" style="filter: drop-shadow(0 0 6px rgba(92, 225, 230, 0.4));">
+                                <ellipse cx="12" cy="12" rx="9" ry="6" fill="#5ce1e6" opacity="0.5"/>
+                                <circle cx="12" cy="12" r="3.5" fill="#38bdf8"/>
+                                <circle cx="12" cy="12" r="1.5" fill="#ffffff"/>
+                            </svg>
+                        </span>
+                        <span>Detail</span>
+                    </button>
+                </div>
+                <span class="last-updated">2 hari lalu</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Prevent zoom on input focus for iOS
+        document.addEventListener('touchstart', function() {}, {passive: true});
+
+        function goBack() {
+            console.log('Going back...');
+            window.history.back();
+        }
+
+        function addNewAsset() {
+            console.log('Adding new asset...');
+            alert('Membuka form tambah aset baru');
+        }
+
+        function handleSearch(value) {
+            console.log('Searching for:', value);
+            // Add your search logic here
+        }
+
+        function toggleFilter(element) {
+            // Remove active class from all filters
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+
+            // Add active class to clicked filter
+            element.classList.add('active');
+
+            const filterText = element.textContent.trim();
+            console.log('Filter applied:', filterText);
+        }
+
+        function scanAsset() {
+            console.log('Opening camera for QR/Barcode scan...');
+            alert('Membuka kamera untuk scan QR/Barcode aset');
+        }
+
+        function toggleSort() {
+            console.log('Toggling sort order...');
+            alert('Opsi sorting:\n- Terbaru\n- Terlama\n- A-Z\n- Z-A');
+        }
+
+        function viewAssetDetail(assetId) {
+            console.log('Viewing asset detail:', assetId);
+            alert(`Membuka detail aset ${assetId}`);
+        }
+
+        function checkAsset(assetId) {
+            console.log('Checking asset:', assetId);
+            alert(`Melakukan check untuk aset ${assetId}`);
+        }
+
+        function viewDetails(assetId) {
+            console.log('Viewing details for:', assetId);
+            alert(`Melihat detail lengkap aset ${assetId}`);
+        }
+
+        // Handle viewport height changes
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+        window.addEventListener('resize', () => {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>TALOS - Detail Jadwal Shift (Dark Mode)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f0c29 0%, #1a1a2e 50%, #16213e 100%);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            color: #e4e4e7;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            padding: 12px 20px 20px;
+            box-shadow: 0 8px 24px rgba(38, 208, 206, 0.3),
+                        0 4px 12px rgba(26, 41, 128, 0.4);
+            position: relative;
+            z-index: 100;
+        }
+
+        .status-bar {
+            height: 44px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+            font-size: 24px;
+            color: white;
+        }
+
+        .back-btn:active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0.95);
+        }
+
+        .header-info {
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 16px rgba(0, 255, 136, 0.8),
+                        0 0 24px rgba(0, 255, 136, 0.4);
+            animation: pulse-indicator 2s infinite;
+        }
+
+        @keyframes pulse-indicator {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px 20px 90px;
+        }
+
+        /* Info Card */
+        .info-card {
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(63, 63, 70, 0.5);
+        }
+
+        .shift-id {
+            font-size: 24px;
+            font-weight: 800;
+            color: #e4e4e7;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(63, 63, 70, 0.5);
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #26d0ce 0%, #1a9cff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(63, 63, 70, 0.3);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: 14px;
+            color: #a1a1aa;
+            font-weight: 600;
+            flex: 0 0 140px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            color: #e4e4e7;
+            font-weight: 600;
+            flex: 1;
+            text-align: right;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .status-badge.open {
+            background: rgba(32, 227, 178, 0.2);
+            color: #20e3b2;
+            box-shadow: 0 0 16px rgba(32, 227, 178, 0.2);
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e4e4e7;
+            margin-bottom: 16px;
+            padding-left: 4px;
+        }
+
+        /* Route Card */
+        .route-card {
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #26d0ce;
+            border: 1px solid rgba(63, 63, 70, 0.5);
+            border-left: 4px solid #26d0ce;
+        }
+
+        .route-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(63, 63, 70, 0.5);
+        }
+
+        .route-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, rgba(38, 208, 206, 0.15) 0%, rgba(26, 156, 255, 0.15) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(38, 208, 206, 0.2);
+        }
+
+        .route-info {
+            flex: 1;
+        }
+
+        .route-number {
+            font-size: 12px;
+            color: #a1a1aa;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .route-name {
+            font-size: 16px;
+            color: #e4e4e7;
+            font-weight: 700;
+        }
+
+        .route-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .route-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-icon {
+            font-size: 16px;
+        }
+
+        .detail-text {
+            font-size: 13px;
+            color: #d4d4d8;
+            font-weight: 600;
+        }
+
+        /* Patrol Points */
+        .patrol-points-section {
+            margin-bottom: 20px;
+        }
+
+        .patrol-point-card {
+            background: rgba(24, 24, 27, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(63, 63, 70, 0.5);
+            transition: all 0.2s ease;
+        }
+
+        .patrol-point-card:active {
+            transform: scale(0.99);
+            border-color: rgba(38, 208, 206, 0.3);
+            box-shadow: 0 8px 24px rgba(38, 208, 206, 0.1);
+        }
+
+        .point-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .point-number {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #26d0ce 0%, #1a9cff 100%);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(38, 208, 206, 0.3);
+        }
+
+        .point-info {
+            flex: 1;
+        }
+
+        .point-name {
+            font-size: 15px;
+            color: #e4e4e7;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .point-code {
+            font-size: 12px;
+            color: #a1a1aa;
+            font-weight: 600;
+        }
+
+        .point-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .point-status.pending {
+            background: #f87171;
+            box-shadow: 0 0 12px rgba(248, 113, 113, 0.6),
+                        0 0 24px rgba(248, 113, 113, 0.3);
+        }
+
+        .point-status.completed {
+            background: #00ff88;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.6),
+                        0 0 24px rgba(0, 255, 136, 0.3);
+        }
+
+        .point-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(63, 63, 70, 0.5);
+        }
+
+        .point-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .point-btn:active {
+            transform: scale(0.97);
+        }
+
+        .point-btn.update {
+            background: linear-gradient(135deg, #26d0ce 0%, #4eecc9 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(38, 208, 206, 0.3);
+        }
+
+        .point-btn.update:active {
+            box-shadow: 0 2px 8px rgba(38, 208, 206, 0.4);
+        }
+
+        .point-btn.report {
+            background: linear-gradient(135deg, #f87171 0%, #fb923c 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(248, 113, 113, 0.3);
+        }
+
+        .point-btn.report:active {
+            box-shadow: 0 2px 8px rgba(248, 113, 113, 0.4);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(24, 24, 27, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 12px 20px 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.4),
+                        0 -1px 0 rgba(38, 208, 206, 0.1);
+            z-index: 100;
+            border-top: 1px solid rgba(63, 63, 70, 0.5);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            background: transparent;
+            border: none;
+            min-width: 70px;
+        }
+
+        .nav-item:active {
+            background: rgba(38, 208, 206, 0.1);
+            transform: scale(0.95);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(38, 208, 206, 0.15) 0%, rgba(26, 156, 255, 0.15) 100%);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            transition: all 0.2s ease;
+            filter: grayscale(0.3);
+        }
+
+        .nav-item.active .nav-icon {
+            filter: drop-shadow(0 0 8px rgba(38, 208, 206, 0.6)) grayscale(0);
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #a1a1aa;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active .nav-label {
+            background: linear-gradient(135deg, #26d0ce 0%, #1a9cff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* QR Scanner Button */
+        .qr-scanner-btn {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #26d0ce 0%, #4eecc9 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: 0 8px 24px rgba(38, 208, 206, 0.4),
+                        0 4px 12px rgba(78, 236, 201, 0.3);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            margin-top: -32px;
+        }
+
+        .qr-scanner-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 16px rgba(38, 208, 206, 0.5),
+                        0 2px 8px rgba(78, 236, 201, 0.4);
+        }
+
+        /* Safe area */
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: max(0px, env(safe-area-inset-left));
+                padding-right: max(0px, env(safe-area-inset-right));
+            }
+
+            .bottom-nav {
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .main-content {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .bottom-nav {
+                max-width: 600px;
+                margin: 0 auto;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Smooth scrollbar */
+        .main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .main-content::-webkit-scrollbar-track {
+            background: rgba(24, 24, 27, 0.5);
+        }
+
+        .main-content::-webkit-scrollbar-thumb {
+            background: rgba(38, 208, 206, 0.3);
+            border-radius: 4px;
+        }
+
+        .main-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(38, 208, 206, 0.5);
+        }
+
+        /* Glassmorphism effects */
+        .info-card,
+        .route-card,
+        .patrol-point-card,
+        .bottom-nav {
+            -webkit-backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="status-bar"></div>
+
+        <div class="header-content">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="header-info">
+                <h1 class="header-title">Detail Jadwal Shift</h1>
+                <span class="status-indicator"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Shift Info Card -->
+        <div class="info-card">
+            <div class="shift-id">PS#04279</div>
+
+            <div class="info-row">
+                <span class="info-label">Judul</span>
+                <span class="info-value">Patrol 08/11/2024</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Batas Waktu</span>
+                <span class="info-value">19 Oktober 2025</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">Status Jadwal Shift</span>
+                <span class="info-value">
+                    <span class="status-badge open">
+                        <span>●</span>
+                        <span>Open</span>
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Route Section -->
+        <h2 class="section-title">Rute Patroli</h2>
+
+        <div class="route-card">
+            <div class="route-header">
+                <div class="route-icon">🗺️</div>
+                <div class="route-info">
+                    <div class="route-number">PR#00086</div>
+                    <div class="route-name">Patrol 08/11/2024</div>
+                </div>
+            </div>
+
+            <div class="route-details">
+                <div class="route-detail-item">
+                    <span class="detail-icon">📋</span>
+                    <span class="detail-text">In Order</span>
+                </div>
+                <div class="route-detail-item">
+                    <span class="detail-icon">⏱️</span>
+                    <span class="detail-text">60 minutes</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patrol Points Section -->
+        <h2 class="section-title">Daftar Titik Patrol</h2>
+
+        <div class="patrol-points-section">
+            <!-- Point 1 -->
+            <div class="patrol-point-card">
+                <div class="point-header">
+                    <div class="point-number">1</div>
+                    <div class="point-info">
+                        <div class="point-name">Pos Security Utara</div>
+                        <div class="point-code">[QR: PT-001]</div>
+                    </div>
+                    <span class="point-status pending"></span>
+                </div>
+                <div class="point-actions">
+                    <button class="point-btn update" onclick="updateForm(1)">
+                        <span>📝</span>
+                        <span>Update Form</span>
+                    </button>
+                    <button class="point-btn report" onclick="reportIncident(1)">
+                        <span>⚠️</span>
+                        <span>Report Incident</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Point 2 -->
+            <div class="patrol-point-card">
+                <div class="point-header">
+                    <div class="point-number">2</div>
+                    <div class="point-info">
+                        <div class="point-name">Gedung A Lantai 1</div>
+                        <div class="point-code">[QR: PT-002]</div>
+                    </div>
+                    <span class="point-status pending"></span>
+                </div>
+                <div class="point-actions">
+                    <button class="point-btn update" onclick="updateForm(2)">
+                        <span>📝</span>
+                        <span>Update Form</span>
+                    </button>
+                    <button class="point-btn report" onclick="reportIncident(2)">
+                        <span>⚠️</span>
+                        <span>Report Incident</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Point 3 -->
+            <div class="patrol-point-card">
+                <div class="point-header">
+                    <div class="point-number">3</div>
+                    <div class="point-info">
+                        <div class="point-name">Gedung A Lantai 2</div>
+                        <div class="point-code">[QR: PT-003]</div>
+                    </div>
+                    <span class="point-status pending"></span>
+                </div>
+                <div class="point-actions">
+                    <button class="point-btn update" onclick="updateForm(3)">
+                        <span>📝</span>
+                        <span>Update Form</span>
+                    </button>
+                    <button class="point-btn report" onclick="reportIncident(3)">
+                        <span>⚠️</span>
+                        <span>Report Incident</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Point 4 (Completed Example) -->
+            <div class="patrol-point-card">
+                <div class="point-header">
+                    <div class="point-number">4</div>
+                    <div class="point-info">
+                        <div class="point-name">Parkiran Basement</div>
+                        <div class="point-code">[QR: PT-004]</div>
+                    </div>
+                    <span class="point-status completed"></span>
+                </div>
+                <div class="point-actions">
+                    <button class="point-btn update" onclick="updateForm(4)">
+                        <span>📝</span>
+                        <span>Update Form</span>
+                    </button>
+                    <button class="point-btn report" onclick="reportIncident(4)">
+                        <span>⚠️</span>
+                        <span>Report Incident</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Point 5 -->
+            <div class="patrol-point-card">
+                <div class="point-header">
+                    <div class="point-number">5</div>
+                    <div class="point-info">
+                        <div class="point-name">Area Loading Dock</div>
+                        <div class="point-code">[QR: PT-005]</div>
+                    </div>
+                    <span class="point-status pending"></span>
+                </div>
+                <div class="point-actions">
+                    <button class="point-btn update" onclick="updateForm(5)">
+                        <span>📝</span>
+                        <span>Update Form</span>
+                    </button>
+                    <button class="point-btn report" onclick="reportIncident(5)">
+                        <span>⚠️</span>
+                        <span>Report Incident</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="navigateTo('home')">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Home</span>
+        </button>
+
+        <button class="qr-scanner-btn" onclick="openQRScanner()">
+            <span>📷</span>
+        </button>
+
+        <button class="nav-item" onclick="navigateTo('settings')">
+            <span class="nav-icon">⚙️</span>
+            <span class="nav-label">Settings</span>
+        </button>
+    </nav>
+
+    <script>
+        // Prevent zoom on input focus for iOS
+        document.addEventListener('touchstart', function() {}, {passive: true});
+
+        function goBack() {
+            console.log('Going back...');
+            window.history.back();
+        }
+
+        function updateForm(pointNumber) {
+            console.log('Update form for point:', pointNumber);
+            alert(`Membuka form update untuk titik patrol #${pointNumber}`);
+            // Add your update form logic here
+        }
+
+        function reportIncident(pointNumber) {
+            console.log('Report incident for point:', pointNumber);
+            alert(`Membuka form laporan insiden untuk titik patrol #${pointNumber}`);
+            // Add your report incident logic here
+        }
+
+        function openQRScanner() {
+            console.log('Opening QR scanner...');
+            alert('Membuka QR Scanner untuk scan titik patrol');
+            // Add your QR scanner logic here
+        }
+
+        function navigateTo(page) {
+            console.log('Navigating to:', page);
+            // Add your navigation logic here
+        }
+
+        // Handle viewport height changes
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+        window.addEventListener('resize', () => {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        });
+    </script>
+</body>
+</html>

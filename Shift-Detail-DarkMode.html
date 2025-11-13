@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>TALOS - Detail Jadwal Shift (Dark Mode)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            height: 100vh;
+            background: #0a0e1a;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            padding: 12px 20px 20px;
+            box-shadow: 0 4px 20px rgba(38, 208, 206, 0.3);
+            position: relative;
+            z-index: 100;
+        }
+
+        .status-bar {
+            height: 44px;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 0;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.2s ease;
+            font-size: 24px;
+            color: white;
+        }
+
+        .back-btn:active {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(0.95);
+        }
+
+        .header-info {
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-title {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 16px rgba(0, 255, 136, 1);
+            animation: pulse-indicator 2s infinite;
+        }
+
+        @keyframes pulse-indicator {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px 20px 90px;
+        }
+
+        /* Info Card */
+        .info-card {
+            background: linear-gradient(135deg, #1a1f35 0%, #1e2538 100%);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(38, 208, 206, 0.2);
+        }
+
+        .shift-header-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .shift-id {
+            font-size: 20px;
+            font-weight: 800;
+            color: #e8eaed;
+            letter-spacing: 0.5px;
+        }
+
+        .shift-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            background: rgba(0, 255, 136, 0.15);
+            color: #00ff88;
+            box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+        }
+
+        .progress-section {
+            background: linear-gradient(135deg, rgba(26, 41, 128, 0.2) 0%, rgba(38, 208, 206, 0.2) 100%);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(38, 208, 206, 0.2);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #9aa0a6;
+        }
+
+        .progress-value {
+            font-size: 16px;
+            font-weight: 800;
+            color: #26d0ce;
+            text-shadow: 0 0 10px rgba(38, 208, 206, 0.5);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1a2980 0%, #26d0ce 100%);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 12px rgba(38, 208, 206, 0.6);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #9aa0a6;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            color: #e8eaed;
+            font-weight: 700;
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #e8eaed;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-icon {
+            font-size: 20px;
+        }
+
+        .quick-info {
+            background: linear-gradient(135deg, #1a1f35 0%, #1e2538 100%);
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(38, 208, 206, 0.2);
+        }
+
+        .quick-info-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, rgba(26, 41, 128, 0.3) 0%, rgba(38, 208, 206, 0.3) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border: 1px solid rgba(38, 208, 206, 0.3);
+        }
+
+        .quick-info-content {
+            flex: 1;
+        }
+
+        .quick-info-label {
+            font-size: 12px;
+            color: #9aa0a6;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .quick-info-value {
+            font-size: 15px;
+            color: #e8eaed;
+            font-weight: 700;
+        }
+
+        /* Instructions */
+        .instructions-card {
+            background: linear-gradient(135deg, rgba(255, 159, 67, 0.15) 0%, rgba(255, 107, 107, 0.15) 100%);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff9f43;
+            border: 1px solid rgba(255, 159, 67, 0.3);
+        }
+
+        .instructions-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .instructions-icon {
+            font-size: 20px;
+        }
+
+        .instructions-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e8eaed;
+        }
+
+        .instructions-text {
+            font-size: 13px;
+            color: #bdc1c6;
+            line-height: 1.6;
+        }
+
+        .instructions-text strong {
+            color: #ff9f43;
+        }
+
+        /* Patrol Points */
+        .patrol-points-section {
+            margin-bottom: 20px;
+        }
+
+        .patrol-point-card {
+            background: linear-gradient(135deg, #1a1f35 0%, #1e2538 100%);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .point-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+        }
+
+        .point-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+            color: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 800;
+            flex-shrink: 0;
+            box-shadow: 0 4px 16px rgba(38, 208, 206, 0.4);
+        }
+
+        .point-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .point-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .point-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .point-name {
+            font-size: 15px;
+            color: #e8eaed;
+            font-weight: 700;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .point-code {
+            font-size: 11px;
+            color: #9aa0a6;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .point-status-badge {
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .point-status-badge.pending {
+            background: rgba(255, 71, 87, 0.2);
+            color: #ff6b7a;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .point-status-badge.completed {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .point-status-badge.in-progress {
+            background: rgba(255, 217, 61, 0.25);
+            color: #ffd93d;
+            border: 1px solid rgba(255, 217, 61, 0.4);
+            animation: pulse-badge 2s infinite;
+        }
+
+        @keyframes pulse-badge {
+            0%, 100% { box-shadow: 0 0 8px rgba(255, 217, 61, 0.4); }
+            50% { box-shadow: 0 0 16px rgba(255, 217, 61, 0.7); }
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-dot.pending {
+            background: #ff6b7a;
+            box-shadow: 0 0 8px rgba(255, 107, 122, 0.6);
+        }
+
+        .status-dot.completed {
+            background: #00ff88;
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.6);
+        }
+
+        .status-dot.in-progress {
+            background: #ffd93d;
+            box-shadow: 0 0 10px rgba(255, 217, 61, 0.8);
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.3); }
+        }
+
+        .patrol-point-card.active {
+            border: 1px solid rgba(255, 217, 61, 0.5);
+            box-shadow: 0 4px 20px rgba(255, 217, 61, 0.3);
+            background: linear-gradient(135deg, rgba(255, 217, 61, 0.1) 0%, #1a1f35 50%);
+        }
+
+        .active-patrol-banner {
+            background: linear-gradient(135deg, rgba(255, 217, 61, 0.2) 0%, rgba(255, 237, 78, 0.2) 100%);
+            padding: 10px 14px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            animation: glow-banner 2s infinite;
+            border: 1px solid rgba(255, 217, 61, 0.3);
+        }
+
+        @keyframes glow-banner {
+            0%, 100% { box-shadow: 0 0 12px rgba(255, 217, 61, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(255, 217, 61, 0.5); }
+        }
+
+        .active-patrol-icon {
+            font-size: 18px;
+        }
+
+        .active-patrol-text {
+            font-size: 13px;
+            font-weight: 700;
+            color: #ffd93d;
+            flex: 1;
+        }
+
+        .point-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .point-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .point-btn:active {
+            transform: scale(0.97);
+        }
+
+        .point-btn.update {
+            background: linear-gradient(135deg, #26d0ce 0%, #4eecc9 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(38, 208, 206, 0.4);
+        }
+
+        .point-btn.report {
+            background: linear-gradient(135deg, #ff4757 0%, #ff6b7a 100%);
+            color: white;
+            box-shadow: 0 4px 16px rgba(255, 71, 87, 0.4);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #13182b 0%, #1a1f35 100%);
+            padding: 12px 20px 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            background: transparent;
+            border: none;
+            min-width: 70px;
+        }
+
+        .nav-item:active {
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(0.95);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(26, 41, 128, 0.3) 0%, rgba(38, 208, 206, 0.3) 100%);
+            border: 1px solid rgba(38, 208, 206, 0.3);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #9aa0a6;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item.active .nav-label {
+            color: #26d0ce;
+            text-shadow: 0 0 10px rgba(38, 208, 206, 0.5);
+        }
+
+        /* QR Scanner Button */
+        .qr-scanner-btn {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #26d0ce 0%, #4eecc9 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 28px rgba(38, 208, 206, 0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            margin-top: -32px;
+            position: relative;
+        }
+
+        .qr-scanner-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 20px rgba(38, 208, 206, 0.7);
+        }
+
+        .scan-icon-wrapper {
+            position: relative;
+            width: 36px;
+            height: 36px;
+        }
+
+        .scan-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 28px;
+            height: 28px;
+            border: 3px solid white;
+            border-radius: 6px;
+        }
+
+        .scan-corner {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border: 3px solid white;
+        }
+
+        .scan-corner.top-left {
+            top: -2px;
+            left: -2px;
+            border-right: none;
+            border-bottom: none;
+            border-radius: 4px 0 0 0;
+        }
+
+        .scan-corner.top-right {
+            top: -2px;
+            right: -2px;
+            border-left: none;
+            border-bottom: none;
+            border-radius: 0 4px 0 0;
+        }
+
+        .scan-corner.bottom-left {
+            bottom: -2px;
+            left: -2px;
+            border-right: none;
+            border-top: none;
+            border-radius: 0 0 0 4px;
+        }
+
+        .scan-corner.bottom-right {
+            bottom: -2px;
+            right: -2px;
+            border-left: none;
+            border-top: none;
+            border-radius: 0 0 4px 0;
+        }
+
+        .nfc-wave {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+        }
+
+        .nfc-wave::before,
+        .nfc-wave::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px solid white;
+            border-radius: 50%;
+            animation: nfc-pulse 2s infinite;
+        }
+
+        .nfc-wave::before {
+            width: 12px;
+            height: 12px;
+        }
+
+        .nfc-wave::after {
+            width: 20px;
+            height: 20px;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes nfc-pulse {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(1.5);
+            }
+        }
+
+        /* Safe area */
+        @supports (padding: max(0px)) {
+            body {
+                padding-left: max(0px, env(safe-area-inset-left));
+                padding-right: max(0px, env(safe-area-inset-right));
+            }
+
+            .bottom-nav {
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .main-content {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+
+            .bottom-nav {
+                max-width: 600px;
+                margin: 0 auto;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="status-bar"></div>
+
+        <div class="header-content">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="header-info">
+                <h1 class="header-title">Detail Jadwal Shift</h1>
+                <span class="status-indicator"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Shift Info Card -->
+        <div class="info-card">
+            <div class="shift-header-section">
+                <div class="shift-id">PS#04279</div>
+                <span class="shift-status-badge">
+                    <span>●</span>
+                    <span>Aktif</span>
+                </span>
+            </div>
+
+            <!-- Progress Section -->
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span class="progress-label">Progress Patroli</span>
+                    <span class="progress-value">1 / 5</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 20%"></div>
+                </div>
+            </div>
+
+            <!-- Info Grid -->
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; filter: drop-shadow(0 0 4px rgba(38, 208, 206, 0.4));">
+                            <rect x="3" y="4" width="18" height="18" rx="2" fill="#26d0ce"/>
+                            <path d="M16 2V6M8 2V6" stroke="#e0f2fe" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M3 10H21" stroke="#ffffff" stroke-width="2"/>
+                        </svg>
+                        Tanggal
+                    </div>
+                    <div class="info-value">08 Nov 2024</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle; filter: drop-shadow(0 0 4px rgba(38, 208, 206, 0.4));">
+                            <circle cx="12" cy="12" r="10" fill="#26d0ce"/>
+                            <path d="M12 6V12L16 14" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="12" cy="12" r="2" fill="#e0f2fe"/>
+                        </svg>
+                        Durasi
+                    </div>
+                    <div class="info-value">60 menit</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <!-- <div class="instructions-card">
+            <div class="instructions-header">
+                <span class="instructions-icon">💡</span>
+                <span class="instructions-title">Cara Patroli</span>
+            </div>
+            <p class="instructions-text">
+                Gunakan tombol <strong>Scan/NFC</strong> di bawah untuk check-in di setiap titik patroli. Scan QR code atau tap kartu NFC di lokasi.
+            </p>
+        </div> -->
+
+        <!-- Quick Info -->
+        <div class="quick-info">
+            <div class="quick-info-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.5));">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#5ce1e6"/>
+                    <path d="M2 17L12 22L22 17" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="#e0f2fe" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            <div class="quick-info-content">
+                <div class="quick-info-label">Rute Patroli</div>
+                <div class="quick-info-value">PR#00086 - Patrol 08/11/2024</div>
+            </div>
+        </div>
+
+        <!-- Patrol Points Section -->
+        <h2 class="section-title">
+            <span class="section-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.5));">
+                    <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z" fill="#5ce1e6"/>
+                    <circle cx="12" cy="9" r="3" fill="#e0f2fe"/>
+                    <circle cx="12" cy="9" r="1.5" fill="#38bdf8"/>
+                </svg>
+            </span>
+            Titik Patroli
+        </h2>
+
+        <div class="patrol-points-section">
+            <!-- Point 1 - Active -->
+            <div class="patrol-point-card active">
+                <div class="point-header">
+                    <div class="point-number">1</div>
+                    <div class="point-content">
+                        <div class="point-top">
+                            <div class="point-info">
+                                <div class="point-name">Pos Security Utara</div>
+                                <div class="point-code">QR: PT-001</div>
+                            </div>
+                            <span class="point-status-badge in-progress">
+                                <span class="status-dot in-progress"></span>
+                                <span>Aktif</span>
+                            </span>
+                        </div>
+                        <div class="active-patrol-banner">
+                            <span class="active-patrol-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display: inline-block; vertical-align: middle;">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z" fill="#ffd93d"/>
+                                    <circle cx="12" cy="9" r="2.5" fill="#1a2332"/>
+                                </svg>
+                            </span>
+                            <span class="active-patrol-text">Sedang patroli di lokasi ini</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="point-actions">
+                    <button class="point-btn update" onclick="updateForm(1)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" fill="white" opacity="0.95"/>
+                            <path d="M14 2V8H20" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2"/>
+                            <line x1="8" y1="13" x2="16" y2="13" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.5"/>
+                            <line x1="8" y1="17" x2="16" y2="17" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.5"/>
+                        </svg>
+                        <span>Update Form</span>
+                    </button>
+                    <button class="point-btn report" onclick="reportIncident(1)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 20H22L12 2Z" fill="white" opacity="0.95"/>
+                            <path d="M12 9V13" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="12" cy="17" r="1" fill="rgba(255, 255, 255, 0.7)"/>
+                        </svg>
+                        <span>Lapor Insiden</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Point 2 -->
+            <div class="patrol-point-card">
+                <div class="point-header">
+                    <div class="point-number">2</div>
+                    <div class="point-content">
+                        <div class="point-top">
+                            <div class="point-info">
+                                <div class="point-name">Gedung A Lantai 1</div>
+                                <div class="point-code">QR: PT-002</div>
+                            </div>
+                            <span class="point-status-badge pending">
+                                <span class="status-dot pending"></span>
+                                <span>Belum</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="point-actions">
+                    <button class="point-btn update" onclick="updateForm(2)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" fill="white" opacity="0.95"/>
+                            <path d="M14 2V8H20" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2"/>
+                            <line x1="8" y1="13" x2="16" y2="13" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.5"/>
+                            <line x1="8" y1="17" x2="16" y2="17" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.5"/>
+                        </svg>
+                        <span>Update Form</span>
+                    </button>
+                    <button class="point-btn report" onclick="reportIncident(2)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 20H22L12 2Z" fill="white" opacity="0.95"/>
+                            <path d="M12 9V13" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="12" cy="17" r="1" fill="rgba(255, 255, 255, 0.7)"/>
+                        </svg>
+                        <span>Lapor Insiden</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Point 3 -->
+            <div class="patrol-point-card">
+                <div class="point-header">
+                    <div class="point-number">3</div>
+                    <div class="point-content">
+                        <div class="point-top">
+                            <div class="point-info">
+                                <div class="point-name">Gedung A Lantai 2</div>
+                                <div class="point-code">QR: PT-003</div>
+                            </div>
+                            <span class="point-status-badge pending">
+                                <span class="status-dot pending"></span>
+                                <span>Belum</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="point-actions">
+                    <button class="point-btn update" onclick="updateForm(3)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" fill="white" opacity="0.95"/>
+                            <path d="M14 2V8H20" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2"/>
+                            <line x1="8" y1="13" x2="16" y2="13" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.5"/>
+                            <line x1="8" y1="17" x2="16" y2="17" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.5"/>
+                        </svg>
+                        <span>Update Form</span>
+                    </button>
+                    <button class="point-btn report" onclick="reportIncident(3)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 20H22L12 2Z" fill="white" opacity="0.95"/>
+                            <path d="M12 9V13" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="12" cy="17" r="1" fill="rgba(255, 255, 255, 0.7)"/>
+                        </svg>
+                        <span>Lapor Insiden</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Point 4 (Completed) -->
+            <div class="patrol-point-card">
+                <div class="point-header">
+                    <div class="point-number">4</div>
+                    <div class="point-content">
+                        <div class="point-top">
+                            <div class="point-info">
+                                <div class="point-name">Parkiran Basement</div>
+                                <div class="point-code">QR: PT-004</div>
+                            </div>
+                            <span class="point-status-badge completed">
+                                <span class="status-dot completed"></span>
+                                <span>Selesai</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="point-actions">
+                    <button class="point-btn update" onclick="updateForm(4)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" fill="white" opacity="0.95"/>
+                            <path d="M14 2V8H20" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2"/>
+                            <line x1="8" y1="13" x2="16" y2="13" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.5"/>
+                            <line x1="8" y1="17" x2="16" y2="17" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.5"/>
+                        </svg>
+                        <span>Update Form</span>
+                    </button>
+                    <button class="point-btn report" onclick="reportIncident(4)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 20H22L12 2Z" fill="white" opacity="0.95"/>
+                            <path d="M12 9V13" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="12" cy="17" r="1" fill="rgba(255, 255, 255, 0.7)"/>
+                        </svg>
+                        <span>Lapor Insiden</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Point 5 -->
+            <div class="patrol-point-card">
+                <div class="point-header">
+                    <div class="point-number">5</div>
+                    <div class="point-content">
+                        <div class="point-top">
+                            <div class="point-info">
+                                <div class="point-name">Area Loading Dock</div>
+                                <div class="point-code">QR: PT-005</div>
+                            </div>
+                            <span class="point-status-badge pending">
+                                <span class="status-dot pending"></span>
+                                <span>Belum</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="point-actions">
+                    <button class="point-btn update" onclick="updateForm(5)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 2H6C4.9 2 4 2.9 4 4V20C4 21.1 4.9 22 6 22H18C19.1 22 20 21.1 20 20V8L14 2Z" fill="white" opacity="0.95"/>
+                            <path d="M14 2V8H20" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2"/>
+                            <line x1="8" y1="13" x2="16" y2="13" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.5"/>
+                            <line x1="8" y1="17" x2="16" y2="17" stroke="rgba(255, 255, 255, 0.6)" stroke-width="1.5"/>
+                        </svg>
+                        <span>Update Form</span>
+                    </button>
+                    <button class="point-btn report" onclick="reportIncident(5)">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2L2 20H22L12 2Z" fill="white" opacity="0.95"/>
+                            <path d="M12 9V13" stroke="rgba(255, 255, 255, 0.7)" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="12" cy="17" r="1" fill="rgba(255, 255, 255, 0.7)"/>
+                        </svg>
+                        <span>Lapor Insiden</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="navigateTo('home')">
+            <span class="nav-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.4));">
+                    <path d="M3 12L12 3L21 12" stroke="#5ce1e6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M5 10V20C5 20.5 5.5 21 6 21H10V16C10 15.5 10.5 15 11 15H13C13.5 15 14 15.5 14 16V21H18C18.5 21 19 20.5 19 20V10" fill="#38bdf8" opacity="0.9"/>
+                    <rect x="10" y="15" width="4" height="6" fill="#e0f2fe"/>
+                </svg>
+            </span>
+            <span class="nav-label">Home</span>
+        </button>
+
+        <button class="qr-scanner-btn" onclick="openQRScanner()">
+            <div class="scan-icon-wrapper">
+                <div class="scan-icon"></div>
+                <div class="scan-corner top-left"></div>
+                <div class="scan-corner top-right"></div>
+                <div class="scan-corner bottom-left"></div>
+                <div class="scan-corner bottom-right"></div>
+                <div class="nfc-wave"></div>
+            </div>
+        </button>
+
+        <button class="nav-item" onclick="navigateTo('settings')">
+            <span class="nav-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 6px rgba(38, 208, 206, 0.4));">
+                    <circle cx="12" cy="12" r="3" fill="#5ce1e6"/>
+                    <path d="M12 2L10.5 4.5L8 4L7 6.5L4.5 7L4 9.5L2 11L3.5 13.5L2 15L4 16.5L4.5 19L7 19.5L8 22L10.5 21.5L12 24L13.5 21.5L16 22L17 19.5L19.5 19L20 16.5L22 15L20.5 13.5L22 11L20 9.5L19.5 7L17 6.5L16 4L13.5 4.5L12 2Z" fill="#38bdf8"/>
+                    <circle cx="12" cy="12" r="5" stroke="#e0f2fe" stroke-width="1.5" fill="none"/>
+                </svg>
+            </span>
+            <span class="nav-label">Settings</span>
+        </button>
+    </nav>
+
+    <script>
+        // Prevent zoom on input focus for iOS
+        document.addEventListener('touchstart', function() {}, {passive: true});
+
+        function goBack() {
+            console.log('Going back...');
+            window.history.back();
+        }
+
+        function updateForm(pointNumber) {
+            console.log('Update form for point:', pointNumber);
+            alert(`Membuka form update untuk titik patrol #${pointNumber}`);
+            // Add your update form logic here
+        }
+
+        function reportIncident(pointNumber) {
+            console.log('Report incident for point:', pointNumber);
+            alert(`Membuka form laporan insiden untuk titik patrol #${pointNumber}`);
+            // Add your report incident logic here
+        }
+
+        function openQRScanner() {
+            console.log('Opening QR scanner...');
+            alert('Membuka QR Scanner untuk scan titik patrol');
+            // Add your QR scanner logic here
+        }
+
+        function navigateTo(page) {
+            console.log('Navigating to:', page);
+            // Add your navigation logic here
+        }
+
+        // Handle viewport height changes
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+        window.addEventListener('resize', () => {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        });
+
+    </script>
+</body>
+</html>
