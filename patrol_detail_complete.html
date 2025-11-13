@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TALOS - Patrol Detail Complete</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        border: "hsl(var(--border))",
+                        input: "hsl(var(--input))",
+                        ring: "hsl(var(--ring))",
+                        background: "hsl(var(--background))",
+                        foreground: "hsl(var(--foreground))",
+                        primary: {
+                            DEFAULT: "hsl(var(--primary))",
+                            foreground: "hsl(var(--primary-foreground))",
+                        },
+                        secondary: {
+                            DEFAULT: "hsl(var(--secondary))",
+                            foreground: "hsl(var(--secondary-foreground))",
+                        },
+                        destructive: {
+                            DEFAULT: "hsl(var(--destructive))",
+                            foreground: "hsl(var(--destructive-foreground))",
+                        },
+                        muted: {
+                            DEFAULT: "hsl(var(--muted))",
+                            foreground: "hsl(var(--muted-foreground))",
+                        },
+                        accent: {
+                            DEFAULT: "hsl(var(--accent))",
+                            foreground: "hsl(var(--accent-foreground))",
+                        },
+                        card: {
+                            DEFAULT: "hsl(var(--card))",
+                            foreground: "hsl(var(--card-foreground))",
+                        },
+                    },
+                    borderRadius: {
+                        lg: "var(--radius)",
+                        md: "calc(var(--radius) - 2px)",
+                        sm: "calc(var(--radius) - 4px)",
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            /* Dark Mode Design System */
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --card: 222.2 84% 4.9%;
+            --card-foreground: 210 40% 98%;
+            --popover: 222.2 84% 4.9%;
+            --popover-foreground: 210 40% 98%;
+            --primary: 142.1 76.2% 36.3%;
+            --primary-foreground: 355.7 100% 97.3%;
+            --secondary: 217.2 32.6% 17.5%;
+            --secondary-foreground: 210 40% 98%;
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --accent: 217.2 32.6% 17.5%;
+            --accent-foreground: 210 40% 98%;
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 217.2 32.6% 17.5%;
+            --input: 217.2 32.6% 17.5%;
+            --ring: 142.1 76.2% 36.3%;
+            --radius: 0.75rem;
+            
+            /* Status Colors - Dark Mode Optimized */
+            --success: 142.1 76.2% 36.3%;
+            --warning: 38 92% 50%;
+            --error: 0 84.2% 60.2%;
+            --info: 217.2 91.2% 59.8%;
+            
+            /* Patrol Point Types */
+            --nfc-color: 217.2 91.2% 59.8%;
+            --qr-color: 38 92% 50%;
+        }
+        
+        body {
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Dark Mode Button System */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+            border-radius: calc(var(--radius) - 2px);
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            min-height: 48px;
+            padding: 0.75rem 1.5rem;
+            gap: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+        }
+        
+        .btn-primary {
+            background-color: hsl(var(--success));
+            color: hsl(var(--primary-foreground));
+        }
+        
+        .btn-primary:hover {
+            background-color: hsl(var(--success) / 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px 0 hsl(var(--success) / 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: hsl(var(--secondary));
+            color: hsl(var(--secondary-foreground));
+            border: 1px solid hsl(var(--border));
+        }
+        
+        .btn-secondary:hover {
+            background-color: hsl(var(--accent));
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px 0 rgb(0 0 0 / 0.2);
+        }
+        
+        .btn-danger {
+            background-color: hsl(var(--error));
+            color: hsl(var(--destructive-foreground));
+        }
+        
+        .btn-danger:hover {
+            background-color: hsl(var(--error) / 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px 0 hsl(var(--error) / 0.3);
+        }
+        
+        .btn-nfc {
+            background-color: hsl(var(--nfc-color));
+            color: white;
+        }
+        
+        .btn-nfc:hover {
+            background-color: hsl(var(--nfc-color) / 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px 0 hsl(var(--nfc-color) / 0.3);
+        }
+        
+        .btn-qr {
+            background-color: hsl(var(--qr-color));
+            color: white;
+        }
+        
+        .btn-qr:hover {
+            background-color: hsl(var(--qr-color) / 0.9);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px 0 hsl(var(--qr-color) / 0.3);
+        }
+        
+        /* Dark Mode Card System */
+        .patrol-card {
+            background: hsl(var(--card));
+            border: 1px solid hsl(var(--border));
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .patrol-card.current {
+            border-color: hsl(var(--success));
+            box-shadow: 0 0 0 2px hsl(var(--success) / 0.2);
+            background: hsl(var(--success) / 0.05);
+        }
+        
+        .patrol-card.completed {
+            background: hsl(var(--success) / 0.1);
+            border-color: hsl(var(--success) / 0.3);
+        }
+        
+        .patrol-card.pending {
+            background: hsl(var(--muted) / 0.5);
+            border-color: hsl(var(--border));
+        }
+        
+        /* Status Badge System */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.375rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .status-active {
+            background: hsl(var(--success) / 0.2);
+            color: hsl(var(--success));
+        }
+        
+        .status-completed {
+            background: hsl(var(--success) / 0.2);
+            color: hsl(var(--success));
+        }
+        
+        .status-pending {
+            background: hsl(var(--muted));
+            color: hsl(var(--muted-foreground));
+        }
+        
+        /* Scan Type Indicators */
+        .scan-type {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .scan-nfc {
+            background: hsl(var(--nfc-color) / 0.2);
+            color: hsl(var(--nfc-color));
+        }
+        
+        .scan-qr {
+            background: hsl(var(--qr-color) / 0.2);
+            color: hsl(var(--qr-color));
+        }
+        
+        /* Progress System */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: hsl(var(--muted));
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: hsl(var(--success));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+        
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        /* Modal System */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .modal-content {
+            background: hsl(var(--card));
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid hsl(var(--border));
+        }
+        
+        /* Checklist System */
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border: 1px solid hsl(var(--border));
+            border-radius: calc(var(--radius) - 2px);
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .checklist-item:hover {
+            background: hsl(var(--muted) / 0.5);
+        }
+        
+        .checklist-item.completed {
+            background: hsl(var(--success) / 0.1);
+            border-color: hsl(var(--success) / 0.3);
+        }
+        
+        .checklist-checkbox {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid hsl(var(--border));
+            border-radius: 0.25rem;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .checklist-checkbox.checked {
+            background: hsl(var(--success));
+            border-color: hsl(var(--success));
+        }
+        
+        .checklist-checkbox.checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        
+        /* Photo Upload System */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        
+        .photo-item {
+            aspect-ratio: 1;
+            border-radius: calc(var(--radius) - 4px);
+            overflow: hidden;
+            border: 1px solid hsl(var(--border));
+            cursor: pointer;
+        }
+        
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-upload-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: hsl(var(--muted));
+            color: hsl(var(--muted-foreground));
+            aspect-ratio: 1;
+            border: 2px dashed hsl(var(--border));
+            border-radius: calc(var(--radius) - 4px);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .photo-upload-btn:hover {
+            background: hsl(var(--accent));
+            border-color: hsl(var(--primary));
+        }
+        
+        /* Notes System */
+        .notes-input {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            border: 1px solid hsl(var(--border));
+            border-radius: calc(var(--radius) - 2px);
+            background: hsl(var(--background));
+            color: hsl(var(--foreground));
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        .notes-input:focus {
+            outline: 2px solid hsl(var(--ring));
+            outline-offset: 2px;
+        }
+        
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Pulse Animation */
+        .pulse-ring {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            width: 16px;
+            height: 16px;
+            border: 2px solid hsl(var(--success));
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+        
+        /* Collapsible System */
+        .collapsible {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .collapsible.collapsed {
+            max-height: 0;
+        }
+        
+        /* Route Pattern Visualization */
+        .route-pattern {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background: hsl(var(--muted) / 0.5);
+            border-radius: calc(var(--radius) - 2px);
+            border: 1px solid hsl(var(--border));
+        }
+        
+        .pattern-step {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            background: hsl(var(--primary));
+            color: hsl(var(--primary-foreground));
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .pattern-arrow {
+            color: hsl(var(--muted-foreground));
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground dark">
+    <!-- Header with Clear Navigation -->
+    <div class="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
+        <div class="px-4 py-3 flex items-center justify-between">
+            <button onclick="goBack()" class="p-2 -ml-2 hover:bg-muted rounded-lg transition-colors">
+                <i data-lucide="arrow-left" class="w-6 h-6"></i>
+            </button>
+            
+            <div class="text-center">
+                <h1 class="font-bold text-lg">Detail Shift Schedule</h1>
+                <div class="flex items-center justify-center gap-1 text-sm text-muted-foreground">
+                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span>Active</span>
+                </div>
+            </div>
+            
+            <button onclick="showHelp()" class="p-2 -mr-2 hover:bg-muted rounded-lg transition-colors">
+                <i data-lucide="help-circle" class="w-6 h-6"></i>
+            </button>
+        </div>
+        
+        <!-- Overall Progress Bar -->
+        <div class="px-4 pb-3">
+            <div class="flex items-center justify-between text-sm text-muted-foreground mb-2">
+                <span>Patrol Progress</span>
+                <span id="progressText">1 of 5 completed</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="overallProgress" style="width: 20%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="px-4 py-4">
+        
+        <!-- Patrol Schedule Info Card -->
+        <div class="patrol-card mb-4">
+            <div class="mb-4">
+                <h2 class="text-xl font-bold mb-1">PS#00103</h2>
+                <p class="text-muted-foreground mb-3">Tes NFC 17 Juni 2025</p>
+                
+                <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                    <div>
+                        <span class="text-muted-foreground">Due Date:</span>
+                        <p class="font-medium">17 Juni 2025</p>
+                    </div>
+                    <div>
+                        <span class="text-muted-foreground">Status:</span>
+                        <p class="font-medium text-green-400">Open</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Patrol Route Information Card - Always Visible -->
+        <div class="patrol-card mb-6">
+            <h3 class="font-bold text-lg mb-3 flex items-center gap-2">
+                <i data-lucide="route" class="w-5 h-5 text-blue-400"></i>
+                Patrol Route
+            </h3>
+            
+            <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                <div>
+                    <span class="text-muted-foreground">Route Number:</span>
+                    <p class="font-medium text-blue-400">PR#00009</p>
+                </div>
+                <div>
+                    <span class="text-muted-foreground">Route Name:</span>
+                    <p class="font-medium">Patrol NFC</p>
+                </div>
+                <div>
+                    <span class="text-muted-foreground">Pattern:</span>
+                    <p class="font-medium">In Order</p>
+                </div>
+                <div>
+                    <span class="text-muted-foreground">Duration:</span>
+                    <p class="font-medium">60 minutes</p>
+                </div>
+            </div>
+            
+        </div>
+
+        <!-- List Patrol Points -->
+        <h3 class="font-semibold text-lg mb-4">List Patrol Point</h3>
+        
+        <!-- Point 2: Lobby (CURRENT) -->
+        <div class="patrol-card current fade-in" id="point2">
+            <div class="pulse-ring"></div>
+            <div class="flex items-start justify-between mb-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+                        2
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-lg mb-1">Lobby</h4>
+                        <p class="text-muted-foreground text-sm mb-2">LOC#00002</p>
+                        <div class="flex gap-2 mb-2">
+                            <div class="scan-type scan-qr">
+                                <i data-lucide="qr-code" class="w-3 h-3"></i>
+                                QR Code
+                            </div>
+                            <div class="status-badge status-active">
+                                <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                CURRENT
+                            </div>
+                        </div>
+                        <div class="text-xs text-muted-foreground flex items-center gap-1">
+                            <i data-lucide="clipboard-check" class="w-3 h-3"></i>
+                            Has checklist (2 items)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-green-50/10 border border-green-200/20 rounded-lg p-4 mb-4">
+                <div class="flex items-start gap-3">
+                    <i data-lucide="info" class="w-5 h-5 text-green-400 mt-0.5"></i>
+                    <div>
+                        <h4 class="font-semibold text-green-400 mb-1">Next Step</h4>
+                        <p class="text-green-300 text-sm">Scan the QR code at this checkpoint to complete this patrol point.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="space-y-3">
+                <button class="btn btn-qr w-full" onclick="scanQR('LOC#00002', true)">
+                    <i data-lucide="qr-code" class="w-5 h-5"></i>
+                    Scan QR Code
+                </button>
+                
+                <div class="flex gap-3">
+                    <button class="btn btn-secondary flex-1" onclick="uploadPhoto('LOC#00002')">
+                        <i data-lucide="camera" class="w-4 h-4"></i>
+                        Photo
+                    </button>
+                    <button class="btn btn-secondary flex-1" onclick="addNote('LOC#00002')">
+                        <i data-lucide="sticky-note" class="w-4 h-4"></i>
+                        Note
+                    </button>
+                    <button class="btn btn-secondary" onclick="manageChecklist('LOC#00002')">
+                        <i data-lucide="settings" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Point 3: Staff Room (NFC no checklist) -->
+        <div class="patrol-card pending" id="point3">
+            <div class="flex items-start gap-3">
+                <div class="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center text-white font-bold">
+                    3
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-semibold mb-1">Staff Room</h4>
+                    <p class="text-muted-foreground text-sm mb-2">LOC#00005</p>
+                    <div class="flex gap-2 mb-2">
+                        <div class="scan-type scan-nfc">
+                            <i data-lucide="smartphone" class="w-3 h-3"></i>
+                            NFC
+                        </div>
+                        <div class="status-badge status-pending">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            PENDING
+                        </div>
+                    </div>
+                    <div class="text-xs text-muted-foreground">
+                        No checklist required
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn btn-secondary text-xs px-2 py-1" onclick="uploadPhoto('LOC#00005')">
+                        <i data-lucide="camera" class="w-3 h-3"></i>
+                    </button>
+                    <button class="btn btn-secondary text-xs px-2 py-1" onclick="addNote('LOC#00005')">
+                        <i data-lucide="sticky-note" class="w-3 h-3"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Point 4: Emergency Exit (QR with Checklist) -->
+        <div class="patrol-card pending" id="point4">
+            <div class="flex items-start gap-3">
+                <div class="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center text-white font-bold">
+                    4
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-semibold mb-1">Emergency Exit</h4>
+                    <p class="text-muted-foreground text-sm mb-2">LOC#00010</p>
+                    <div class="flex gap-2 mb-2">
+                        <div class="scan-type scan-qr">
+                            <i data-lucide="qr-code" class="w-3 h-3"></i>
+                            QR Code
+                        </div>
+                        <div class="status-badge status-pending">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            PENDING
+                        </div>
+                    </div>
+                    <div class="text-xs text-muted-foreground flex items-center gap-1">
+                        <i data-lucide="clipboard-check" class="w-3 h-3"></i>
+                        Has checklist (4 items)
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn btn-secondary text-xs px-2 py-1" onclick="uploadPhoto('LOC#00010')">
+                        <i data-lucide="camera" class="w-3 h-3"></i>
+                    </button>
+                    <button class="btn btn-secondary text-xs px-2 py-1" onclick="addNote('LOC#00010')">
+                        <i data-lucide="sticky-note" class="w-3 h-3"></i>
+                    </button>
+                    <button class="btn btn-secondary text-xs px-2 py-1" onclick="manageChecklist('LOC#00010')">
+                        <i data-lucide="settings" class="w-3 h-3"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Point 5: Security Office (NFC no checklist) -->
+        <div class="patrol-card pending" id="point5">
+            <div class="flex items-start gap-3">
+                <div class="w-12 h-12 bg-gray-600 rounded-full flex items-center justify-center text-white font-bold">
+                    5
+                </div>
+                <div class="flex-1">
+                    <h4 class="font-semibold mb-1">Security Office</h4>
+                    <p class="text-muted-foreground text-sm mb-2">LOC#00001</p>
+                    <div class="flex gap-2 mb-2">
+                        <div class="scan-type scan-nfc">
+                            <i data-lucide="smartphone" class="w-3 h-3"></i>
+                            NFC
+                        </div>
+                        <div class="status-badge status-pending">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full"></div>
+                            PENDING
+                        </div>
+                    </div>
+                    <div class="text-xs text-muted-foreground">
+                        No checklist required
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="btn btn-secondary text-xs px-2 py-1" onclick="uploadPhoto('LOC#00001')">
+                        <i data-lucide="camera" class="w-3 h-3"></i>
+                    </button>
+                    <button class="btn btn-secondary text-xs px-2 py-1" onclick="addNote('LOC#00001')">
+                        <i data-lucide="sticky-note" class="w-3 h-3"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Completed Points Section -->
+        <div class="mt-8">
+            <h3 class="font-semibold text-lg mb-4 flex items-center gap-2 text-muted-foreground">
+                <i data-lucide="check-circle" class="w-5 h-5"></i>
+                Completed Points
+            </h3>
+            
+            <!-- Point 1: Parkiran Depan (COMPLETED) -->
+            <div class="patrol-card completed" id="point1-completed">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
+                            ✓
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">Parkiran Depan</h4>
+                            <p class="text-muted-foreground text-sm mb-2">LOC#00008</p>
+                            <div class="flex gap-2 mb-2">
+                                <div class="scan-type scan-nfc">
+                                    <i data-lucide="smartphone" class="w-3 h-3"></i>
+                                    NFC
+                                </div>
+                                <div class="status-badge status-completed">
+                                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                                    COMPLETED
+                                </div>
+                            </div>
+                            <div class="text-xs text-green-400 flex items-center gap-1">
+                                <i data-lucide="clock" class="w-3 h-3"></i>
+                                Completed at 9:15 AM
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Photos Grid (4 photos) -->
+                <div class="mb-4">
+                    <h5 class="text-sm font-medium mb-2 flex items-center gap-2">
+                        <i data-lucide="camera" class="w-4 h-4"></i>
+                        Photos (4/4)
+                    </h5>
+                    <div class="photo-grid">
+                        <div class="photo-item">
+                            <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=150&h=150&fit=crop&crop=center" alt="Parking gate view" onclick="viewPhoto('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop&crop=center')">
+                        </div>
+                        <div class="photo-item">
+                            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=150&h=150&fit=crop&crop=center" alt="Parking area lights" onclick="viewPhoto('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center')">
+                        </div>
+                        <div class="photo-item">
+                            <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=150&h=150&fit=crop&crop=center" alt="Security camera" onclick="viewPhoto('https://images.unsplash.com/photo-1497366216548-37526070297c?w=150&h=150&fit=crop&crop=center')">
+                        </div>
+                        <div class="photo-item">
+                            <img src="https://images.unsplash.com/photo-1534644107580-3a4dbd494a95?w=150&h=150&fit=crop&crop=center" alt="NFC tag location" onclick="viewPhoto('https://images.unsplash.com/photo-1534644107580-3a4dbd494a95?w=400&h=400&fit=crop&crop=center')">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes Section -->
+                <div class="mb-4">
+                    <h5 class="text-sm font-medium mb-2 flex items-center gap-2">
+                        <i data-lucide="sticky-note" class="w-4 h-4"></i>
+                        Notes
+                    </h5>
+                    <div class="bg-muted/30 rounded-lg p-3">
+                        <p class="text-sm">✅ All parking gate mechanisms working properly. Lighting is adequate. Security camera has clear view angle. NFC tag responds immediately when scanned. No maintenance issues observed.</p>
+                        <p class="text-xs text-muted-foreground mt-2">Added at 9:15 AM</p>
+                    </div>
+                </div>
+
+                <!-- Completed Checklist Summary -->
+                <div class="bg-green-500/10 border border-green-500/20 rounded-lg p-3">
+                    <div class="flex items-center gap-2 text-green-400 text-sm font-medium">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        Checklist Complete (3/3)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checklist Modal -->
+    <div class="modal-overlay" id="checklistModal">
+        <div class="modal-content slide-up" style="max-width: 400px;">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold" id="checklistTitle">Parking Area Checklist</h3>
+                <button onclick="closeModal('checklistModal')" class="p-1 hover:bg-muted rounded">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div id="checklistItems" class="space-y-3 mb-6">
+                <!-- Checklist items will be populated here -->
+            </div>
+            
+            <div class="flex gap-3">
+                <button class="btn btn-secondary flex-1" onclick="closeModal('checklistModal')">
+                    Cancel
+                </button>
+                <button class="btn btn-primary flex-1" onclick="completeChecklist()" id="completeChecklistBtn" disabled>
+                    Complete Scan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Photo Upload Modal -->
+    <div class="modal-overlay" id="photoModal">
+        <div class="modal-content slide-up" style="max-width: 400px;">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold" id="photoTitle">Upload Photos</h3>
+                <button onclick="closeModal('photoModal')" class="p-1 hover:bg-muted rounded">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div class="photo-grid mb-4" id="photoGrid">
+                <div class="photo-upload-btn" onclick="capturePhoto()">
+                    <i data-lucide="camera" class="w-6 h-6"></i>
+                </div>
+            </div>
+            
+            <input type="file" id="photoInput" accept="image/*" capture="camera" style="display: none;" onchange="handlePhotoUpload(event)">
+            
+            <div class="flex gap-3">
+                <button class="btn btn-secondary flex-1" onclick="closeModal('photoModal')">
+                    Done
+                </button>
+                <button class="btn btn-primary flex-1" onclick="capturePhoto()">
+                    <i data-lucide="camera" class="w-4 h-4"></i>
+                    Take Photo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notes Modal -->
+    <div class="modal-overlay" id="notesModal">
+        <div class="modal-content slide-up" style="max-width: 400px;">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold" id="notesTitle">Add Note</h3>
+                <button onclick="closeModal('notesModal')" class="p-1 hover:bg-muted rounded">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <textarea 
+                id="notesInput" 
+                class="notes-input mb-4" 
+                placeholder="Enter your notes about this patrol point..."
+            ></textarea>
+            
+            <div class="flex gap-3">
+                <button class="btn btn-secondary flex-1" onclick="closeModal('notesModal')">
+                    Cancel
+                </button>
+                <button class="btn btn-primary flex-1" onclick="saveNote()">
+                    <i data-lucide="save" class="w-4 h-4"></i>
+                    Save Note
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checklist Management Modal -->
+    <div class="modal-overlay" id="manageChecklistModal">
+        <div class="modal-content slide-up" style="max-width: 500px;">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold" id="manageTitle">Manage Checklist</h3>
+                <button onclick="closeModal('manageChecklistModal')" class="p-1 hover:bg-muted rounded">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div id="manageChecklistItems" class="space-y-3 mb-4">
+                <!-- Editable checklist items will be populated here -->
+            </div>
+            
+            <button class="btn btn-secondary w-full mb-4" onclick="addChecklistItem()">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                Add New Item
+            </button>
+            
+            <div class="flex gap-3">
+                <button class="btn btn-secondary flex-1" onclick="closeModal('manageChecklistModal')">
+                    Cancel
+                </button>
+                <button class="btn btn-primary flex-1" onclick="saveChecklistChanges()">
+                    <i data-lucide="save" class="w-4 h-4"></i>
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        lucide.createIcons();
+        
+        // Patrol state management
+        let currentPointIndex = 1; // Currently on point 2 (index 1)
+        let totalPoints = 5;
+        let completedPoints = 1; // Point 1 is completed
+        let currentLocationId = null;
+        let pointPhotos = {
+            'LOC#00008': [
+                {
+                    id: 1,
+                    url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=400&fit=crop&crop=center',
+                    timestamp: '2024-06-17T09:15:00Z',
+                    alt: 'Parking gate view'
+                },
+                {
+                    id: 2,
+                    url: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=400&fit=crop&crop=center',
+                    timestamp: '2024-06-17T09:15:00Z',
+                    alt: 'Parking area lights'
+                },
+                {
+                    id: 3,
+                    url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=400&fit=crop&crop=center',
+                    timestamp: '2024-06-17T09:15:00Z',
+                    alt: 'Security camera'
+                },
+                {
+                    id: 4,
+                    url: 'https://images.unsplash.com/photo-1534644107580-3a4dbd494a95?w=400&h=400&fit=crop&crop=center',
+                    timestamp: '2024-06-17T09:15:00Z',
+                    alt: 'NFC tag location'
+                }
+            ]
+        };
+        let pointNotes = {
+            'LOC#00008': '✅ All parking gate mechanisms working properly. Lighting is adequate. Security camera has clear view angle. NFC tag responds immediately when scanned. No maintenance issues observed.'
+        };
+        
+        // Checklist data structure
+        const checklistData = {
+            'LOC#00008': [
+                { id: 1, text: 'Check parking gate operation', completed: true, required: true },
+                { id: 2, text: 'Verify lighting functionality', completed: true, required: true },
+                { id: 3, text: 'Inspect security cameras', completed: true, required: true }
+            ],
+            'LOC#00002': [
+                { id: 1, text: 'Check reception desk area', completed: false, required: true },
+                { id: 2, text: 'Verify visitor log book', completed: false, required: true }
+            ],
+            'LOC#00010': [
+                { id: 1, text: 'Test emergency exit door', completed: false, required: true },
+                { id: 2, text: 'Check exit sign lighting', completed: false, required: true },
+                { id: 3, text: 'Verify alarm system', completed: false, required: true },
+                { id: 4, text: 'Inspect fire extinguisher', completed: false, required: true }
+            ]
+        };
+        
+        // Initialize the application
+        function initializePatrol() {
+            updateProgress();
+        }
+        
+        // Update overall progress
+        function updateProgress() {
+            const progressPercent = (completedPoints / totalPoints) * 100;
+            document.getElementById('overallProgress').style.width = progressPercent + '%';
+            document.getElementById('progressText').textContent = `${completedPoints} of ${totalPoints} completed`;
+        }
+        
+        
+        // Main scanning functions
+        function scanNFC(locationId, hasChecklist = false) {
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+            
+            currentLocationId = locationId;
+            
+            // If has checklist, show checklist modal
+            if (hasChecklist && checklistData[locationId]) {
+                showChecklistModal(locationId);
+            } else {
+                // Direct completion for points without checklist
+                completePatrolPoint(locationId);
+            }
+        }
+        
+        function scanQR(locationId, hasChecklist = false) {
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+            
+            currentLocationId = locationId;
+            
+            // If has checklist, show checklist modal
+            if (hasChecklist && checklistData[locationId]) {
+                showChecklistModal(locationId);
+            } else {
+                // Direct completion for points without checklist
+                completePatrolPoint(locationId);
+            }
+        }
+        
+        // Show checklist modal
+        function showChecklistModal(locationId) {
+            const modal = document.getElementById('checklistModal');
+            const title = document.getElementById('checklistTitle');
+            const itemsContainer = document.getElementById('checklistItems');
+            
+            // Set title based on location
+            const locationNames = {
+                'LOC#00008': 'Parking Area Checklist',
+                'LOC#00002': 'Lobby Area Checklist',
+                'LOC#00010': 'Emergency Exit Checklist'
+            };
+            
+            title.textContent = locationNames[locationId] || 'Patrol Checklist';
+            
+            // Clear previous items
+            itemsContainer.innerHTML = '';
+            
+            // Populate checklist items
+            const items = checklistData[locationId] || [];
+            items.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `checklist-item ${item.completed ? 'completed' : ''}`;
+                itemDiv.innerHTML = `
+                    <div class="checklist-checkbox ${item.completed ? 'checked' : ''}" 
+                         onclick="toggleChecklistItem(${index})"></div>
+                    <div class="flex-1">
+                        <p class="font-medium">${item.text}</p>
+                        ${item.required ? '<p class="text-xs text-muted-foreground">Required</p>' : ''}
+                    </div>
+                `;
+                itemsContainer.appendChild(item);
+            });
+            
+            modal.style.display = 'flex';
+            updateCompleteButton();
+        }
+        
+        // Toggle checklist item completion
+        function toggleChecklistItem(index) {
+            if (!currentLocationId || !checklistData[currentLocationId]) return;
+            
+            const item = checklistData[currentLocationId][index];
+            item.completed = !item.completed;
+            
+            // Update UI
+            const itemDiv = document.querySelector(`.checklist-item:nth-child(${index + 1})`);
+            const checkbox = itemDiv.querySelector('.checklist-checkbox');
+            
+            if (item.completed) {
+                itemDiv.classList.add('completed');
+                checkbox.classList.add('checked');
+            } else {
+                itemDiv.classList.remove('completed');
+                checkbox.classList.remove('checked');
+            }
+            
+            updateCompleteButton();
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+        
+        // Update complete button state
+        function updateCompleteButton() {
+            const btn = document.getElementById('completeChecklistBtn');
+            if (!currentLocationId || !checklistData[currentLocationId]) return;
+            
+            const items = checklistData[currentLocationId];
+            const requiredItems = items.filter(item => item.required);
+            const completedRequired = requiredItems.filter(item => item.completed);
+            
+            const allRequiredComplete = completedRequired.length === requiredItems.length;
+            
+            btn.disabled = !allRequiredComplete;
+            btn.textContent = allRequiredComplete ? 'Complete Scan' : `${completedRequired.length}/${requiredItems.length} Required`;
+        }
+        
+        // Complete checklist and scan
+        function completeChecklist() {
+            if (!currentLocationId) return;
+            
+            closeModal('checklistModal');
+            completePatrolPoint(currentLocationId);
+        }
+        
+        // Complete patrol point
+        function completePatrolPoint(locationId) {
+            const pointElement = document.getElementById(getPointElementId(locationId));
+            if (!pointElement) return;
+            
+            // Update point status
+            pointElement.classList.remove('current', 'pending');
+            pointElement.classList.add('completed');
+            
+            // Update point number circle
+            const circle = pointElement.querySelector('.w-12.h-12');
+            circle.className = 'w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold';
+            
+            // Update status badge
+            const statusBadge = pointElement.querySelector('.status-badge');
+            statusBadge.className = 'status-badge status-completed';
+            statusBadge.innerHTML = '<div class="w-2 h-2 bg-green-500 rounded-full"></div>COMPLETED';
+            
+            // Remove pulse ring if exists
+            const pulseRing = pointElement.querySelector('.pulse-ring');
+            if (pulseRing) pulseRing.remove();
+            
+            // Update completion count
+            completedPoints++;
+            updateProgress();
+            
+            // Move to next point if not last
+            if (completedPoints < totalPoints) {
+                setTimeout(() => {
+                    moveToNextPoint();
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    showPatrolComplete();
+                }, 1000);
+            }
+            
+            // Show success feedback
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100]);
+            }
+        }
+        
+        // Get point element ID from location ID
+        function getPointElementId(locationId) {
+            const mapping = {
+                'LOC#00008': 'point1',
+                'LOC#00002': 'point2',
+                'LOC#00005': 'point3',
+                'LOC#00010': 'point4',
+                'LOC#00001': 'point5'
+            };
+            return mapping[locationId];
+        }
+        
+        // Move to next patrol point
+        function moveToNextPoint() {
+            currentPointIndex++;
+            
+            const nextPointId = `point${currentPointIndex + 1}`;
+            const nextPoint = document.getElementById(nextPointId);
+            
+            if (nextPoint && !nextPoint.classList.contains('completed')) {
+                nextPoint.classList.remove('pending');
+                nextPoint.classList.add('current');
+                
+                // Add pulse animation
+                const pulseRing = document.createElement('div');
+                pulseRing.className = 'pulse-ring';
+                nextPoint.appendChild(pulseRing);
+                
+                // Update point number circle
+                const circle = nextPoint.querySelector('.w-12.h-12');
+                circle.className = 'w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-white font-bold';
+                
+                // Update status badge
+                const statusBadge = nextPoint.querySelector('.status-badge');
+                statusBadge.className = 'status-badge status-active';
+                statusBadge.innerHTML = '<div class="w-2 h-2 bg-green-500 rounded-full"></div>CURRENT';
+                
+                // Scroll to current point
+                nextPoint.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        // Photo upload functionality
+        function uploadPhoto(locationId) {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            currentLocationId = locationId;
+            
+            const modal = document.getElementById('photoModal');
+            const title = document.getElementById('photoTitle');
+            
+            const locationNames = {
+                'LOC#00008': 'Parkiran Depan Photos',
+                'LOC#00002': 'Lobby Photos',
+                'LOC#00005': 'Staff Room Photos',
+                'LOC#00010': 'Emergency Exit Photos',
+                'LOC#00001': 'Security Office Photos'
+            };
+            
+            title.textContent = locationNames[locationId] || 'Upload Photos';
+            
+            // Load existing photos for this location
+            loadPhotosForLocation(locationId);
+            
+            modal.style.display = 'flex';
+        }
+        
+        function capturePhoto() {
+            document.getElementById('photoInput').click();
+        }
+        
+        function handlePhotoUpload(event) {
+            const file = event.target.files[0];
+            if (!file || !currentLocationId) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Initialize photos array if not exists
+                if (!pointPhotos[currentLocationId]) {
+                    pointPhotos[currentLocationId] = [];
+                }
+                
+                // Add photo to storage
+                pointPhotos[currentLocationId].push({
+                    id: Date.now(),
+                    url: e.target.result,
+                    timestamp: new Date().toISOString()
+                });
+                
+                // Refresh photo grid
+                loadPhotosForLocation(currentLocationId);
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
+            };
+            reader.readAsDataURL(file);
+            
+            // Clear input
+            event.target.value = '';
+        }
+        
+        function loadPhotosForLocation(locationId) {
+            const grid = document.getElementById('photoGrid');
+            grid.innerHTML = '';
+            
+            // Add upload button
+            const uploadBtn = document.createElement('div');
+            uploadBtn.className = 'photo-upload-btn';
+            uploadBtn.onclick = capturePhoto;
+            uploadBtn.innerHTML = '<i data-lucide="camera" class="w-6 h-6"></i>';
+            grid.appendChild(uploadBtn);
+            
+            // Add existing photos
+            const photos = pointPhotos[locationId] || [];
+            photos.forEach(photo => {
+                const photoItem = document.createElement('div');
+                photoItem.className = 'photo-item';
+                photoItem.innerHTML = `<img src="${photo.url}" alt="Patrol photo" onclick="viewPhoto('${photo.url}')">`;
+                grid.appendChild(photoItem);
+            });
+            
+            // Recreate icons
+            lucide.createIcons();
+        }
+        
+        function viewPhoto(url) {
+            // Simple photo viewer - could be enhanced with a proper modal
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(`<img src="${url}" style="max-width: 100%; height: auto;">`);
+        }
+        
+        // Notes functionality
+        function addNote(locationId) {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            currentLocationId = locationId;
+            
+            const modal = document.getElementById('notesModal');
+            const title = document.getElementById('notesTitle');
+            const input = document.getElementById('notesInput');
+            
+            const locationNames = {
+                'LOC#00008': 'Parkiran Depan Note',
+                'LOC#00002': 'Lobby Note',
+                'LOC#00005': 'Staff Room Note',
+                'LOC#00010': 'Emergency Exit Note',
+                'LOC#00001': 'Security Office Note'
+            };
+            
+            title.textContent = locationNames[locationId] || 'Add Note';
+            
+            // Load existing note if any
+            input.value = pointNotes[locationId] || '';
+            
+            modal.style.display = 'flex';
+            input.focus();
+        }
+        
+        function saveNote() {
+            const input = document.getElementById('notesInput');
+            const noteText = input.value.trim();
+            
+            if (noteText && currentLocationId) {
+                pointNotes[currentLocationId] = noteText;
+                
+                if (navigator.vibrate) {
+                    navigator.vibrate([50, 50, 50]);
+                }
+            }
+            
+            closeModal('notesModal');
+        }
+        
+        // Checklist management functionality
+        function manageChecklist(locationId) {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            
+            currentLocationId = locationId;
+            
+            const modal = document.getElementById('manageChecklistModal');
+            const title = document.getElementById('manageTitle');
+            
+            const locationNames = {
+                'LOC#00008': 'Manage Parkiran Depan Checklist',
+                'LOC#00002': 'Manage Lobby Checklist',
+                'LOC#00010': 'Manage Emergency Exit Checklist'
+            };
+            
+            title.textContent = locationNames[locationId] || 'Manage Checklist';
+            
+            loadManageChecklistItems(locationId);
+            
+            modal.style.display = 'flex';
+        }
+        
+        function loadManageChecklistItems(locationId) {
+            const container = document.getElementById('manageChecklistItems');
+            container.innerHTML = '';
+            
+            const items = checklistData[locationId] || [];
+            
+            items.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'checklist-item';
+                itemDiv.innerHTML = `
+                    <div class="flex-1">
+                        <input type="text" value="${item.text}" 
+                               class="w-full bg-transparent border-none outline-none font-medium"
+                               onchange="updateChecklistItemText(${index}, this.value)">
+                        <label class="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            <input type="checkbox" ${item.required ? 'checked' : ''} 
+                                   onchange="updateChecklistItemRequired(${index}, this.checked)">
+                            Required item
+                        </label>
+                    </div>
+                    <button class="btn btn-danger text-xs px-2 py-1" onclick="removeChecklistItem(${index})">
+                        <i data-lucide="trash-2" class="w-3 h-3"></i>
+                    </button>
+                `;
+                container.appendChild(itemDiv);
+            });
+            
+            // Recreate icons
+            lucide.createIcons();
+        }
+        
+        function updateChecklistItemText(index, newText) {
+            if (currentLocationId && checklistData[currentLocationId] && checklistData[currentLocationId][index]) {
+                checklistData[currentLocationId][index].text = newText;
+            }
+        }
+        
+        function updateChecklistItemRequired(index, required) {
+            if (currentLocationId && checklistData[currentLocationId] && checklistData[currentLocationId][index]) {
+                checklistData[currentLocationId][index].required = required;
+            }
+        }
+        
+        function removeChecklistItem(index) {
+            if (currentLocationId && checklistData[currentLocationId]) {
+                checklistData[currentLocationId].splice(index, 1);
+                loadManageChecklistItems(currentLocationId);
+            }
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(100);
+            }
+        }
+        
+        function addChecklistItem() {
+            if (!currentLocationId) return;
+            
+            if (!checklistData[currentLocationId]) {
+                checklistData[currentLocationId] = [];
+            }
+            
+            checklistData[currentLocationId].push({
+                id: Date.now(),
+                text: 'New checklist item',
+                completed: false,
+                required: true
+            });
+            
+            loadManageChecklistItems(currentLocationId);
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+        
+        function saveChecklistChanges() {
+            // Changes are automatically saved as they're made
+            closeModal('manageChecklistModal');
+            
+            if (navigator.vibrate) {
+                navigator.vibrate([50, 50, 50]);
+            }
+        }
+        
+        // Modal management
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+            currentLocationId = null;
+        }
+        
+        // Show patrol completion
+        function showPatrolComplete() {
+            const overlay = document.createElement('div');
+            overlay.className = 'modal-overlay';
+            overlay.style.display = 'flex';
+            overlay.innerHTML = `
+                <div class="modal-content slide-up">
+                    <div class="text-center">
+                        <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i data-lucide="check-circle" class="w-8 h-8 text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Patrol Complete!</h3>
+                        <p class="text-muted-foreground mb-6">
+                            All ${totalPoints} patrol points have been successfully completed.
+                        </p>
+                        <div class="space-y-2">
+                            <button class="btn btn-primary w-full" onclick="generateReport()">
+                                Generate Report
+                            </button>
+                            <button class="btn btn-secondary w-full" onclick="goBack()">
+                                Back to Dashboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(overlay);
+            lucide.createIcons();
+        }
+        
+        // Navigation functions
+        function goBack() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            if (confirm('🔙 Return to patrol schedule?\n\nYour progress will be saved.')) {
+                window.history.back();
+            }
+        }
+        
+        function showProgress() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            alert(`📊 Patrol Progress\n\nCompleted: ${completedPoints}/${totalPoints}\nPhotos taken: ${Object.values(pointPhotos).flat().length}\nNotes added: ${Object.keys(pointNotes).length}`);
+        }
+        
+        function showSettings() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            alert(`⚙️ Settings\n\n• Camera quality\n• Auto-save notes\n• Offline sync\n• Help & tutorials`);
+        }
+        
+        function showHelp() {
+            alert(`❓ Help Guide\n\n1. Scan NFC/QR at each patrol point\n2. Complete checklists if required\n3. Add photos and notes as needed\n4. Progress automatically to next point\n\nUse settings button to manage checklists.`);
+        }
+        
+        function generateReport() {
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+            alert(`📄 Report Generated\n\n✅ Patrol PS#00103 completed\n📍 All ${totalPoints} points scanned\n📷 ${Object.values(pointPhotos).flat().length} photos taken\n📝 ${Object.keys(pointNotes).length} notes added\n\nReport saved to system.`);
+        }
+        
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePatrol();
+        });
+        
+        // Click outside modal to close
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal-overlay')) {
+                e.target.style.display = 'none';
+                currentLocationId = null;
+            }
+        });
+    </script>
+</body>
+</html>
